@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+</head>
+<body>
+    <h1>Register</h1>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    
+    <form method="POST">
+        {% csrf_token %}
+        
+        <label>{{ form.email.label }}</label>
+        {{ form.email }}
+        <label>{{ form.first_name.label }}</label>
+        {{ form.first_name }}
+        <label>{{ form.last_name.label }}</label>
+        {{ form.last_name }}
+        <label>{{ form.password.label }}</label>
+        {{ form.password }}
+        <label>{{ form.password_confirm.label }}</label>
+        {{ form.password_confirm }}
+        <label>{{ form.role.label }}</label>
+        {{ form.role }}
+        <button type="submit">Register</button>
+    </form>
+</body>
+</html>
