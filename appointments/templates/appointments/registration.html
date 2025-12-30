@@ -1,33 +1,45 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Register</title>
-</head>
-<body>
-    <h1>Register</h1>
+{% extends 'appointments/base.html' %}
+
+{% block title %}Register - QueueSmart{% endblock %}
+
+{% block content %}
+    <h2>Create Account</h2>
     
-    {% if messages %}
-        {% for message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
-    {% endif %}
-    
-    <form method="POST">
+    <form method="POST" style="max-width: 500px;">
         {% csrf_token %}
         
-        <label>{{ form.email.label }}</label>
-        {{ form.email }}
-        <label>{{ form.first_name.label }}</label>
-        {{ form.first_name }}
-        <label>{{ form.last_name.label }}</label>
-        {{ form.last_name }}
-        <label>{{ form.password.label }}</label>
-        {{ form.password }}
-        <label>{{ form.password_confirm.label }}</label>
-        {{ form.password_confirm }}
-        <label>{{ form.role.label }}</label>
-        {{ form.role }}
+        <div class="form-group">
+            <label for="email">Email</label>
+            {{ form.email }}
+        </div>
+        
+        <div class="form-group">
+            <label for="first_name">First Name</label>
+            {{ form.first_name }}
+        </div>
+        
+        <div class="form-group">
+            <label for="last_name">Last Name</label>
+            {{ form.last_name }}
+        </div>
+        
+        <div class="form-group">
+            <label for="role">Role</label>
+            {{ form.role }}
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password</label>
+            {{ form.password }}
+        </div>
+        
+        <div class="form-group">
+            <label for="password_confirm">Confirm Password</label>
+            {{ form.password_confirm }}
+        </div>
+        
         <button type="submit">Register</button>
     </form>
-</body>
-</html>
+    
+    <p style="margin-top: 20px;">Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+{% endblock %}

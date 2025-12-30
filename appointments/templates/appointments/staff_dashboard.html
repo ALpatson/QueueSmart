@@ -1,0 +1,87 @@
+{% extends 'appointments/base.html' %}
+
+{% block title %}Staff Dashboard - QueueSmart{% endblock %}
+
+{% block content %}
+    {% if serving_appointment %}
+        <div class="currently-serving">
+            <h2>Currently Serving</h2>
+            <p style="font-size: 24px; margin: 10px 0;">
+                <strong>Queue #{{ serving_appointment.queue_number }}: {{ serving_appointment.client.first_name }} {{ serving_appointment.client.last_name }}</strong>
+            </p>
+            <p>Service: <strong>{{ serving_appointment.service.name }}</strong></p>
+        </div>
+    {% else %}
+        <div class="no-serving">
+            <h2>No One Currently Being Served</h2>
+            <p>Click "Start Serving" on an appointment to begin</p>
+        </div>
+    {% endif %}
+    
+    <h2>Pending Appointments</h2>
+    {% if pending_appointments %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Client Name</th>
+                    <th>Service</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in pending_appointments %}
+                    <tr>
+                        <td>{{ appointment.client.first_name }} {{ appointment.client.last_name }}</td>
+                        <td>{{ appointment.service.name }}</td>
+                        <td>{{ appointment.appointment_date }}</td>
+                        <td>{{ appointment.appointment_time }}</td>
+                        <td><span style="background: #ffc107; padding: 5px 10px; border-radius: 4px; color: black;">{{ appointment.status }}</span></td>
+                        <td class="action-links">
+                            <a href="{% url 'approve_appointment' appointment.id %}" class="btn btn-success">Approve</a>
+                            <a href="{% url 'reject_appointment' appointment.id %}" class="btn btn-danger">Reject</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p style="text-align: center; color: #666; padding: 20px;">No pending appointments</p>
+    {% endif %}
+    
+    <h2>Queue Order</h2>
+    {% if approved_appointments %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Queue #</th>
+                    <th>Client Name</th>
+                    <th>Service</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in approved_appointments %}
+                    <tr>
+                        <td><strong style="font-size: 18px; color: #667eea;">{{ appointment.queue_number }}</strong></td>
+                        <td>{{ appointment.client.first_name }} {{ appointment.client.last_name }}</td>
+                        <td>{{ appointment.service.name }}</td>
+                        <td>{{ appointment.appointment_date }}</td>
+                        <td>{{ appointment.appointment_time }}</td>
+                        <td><span style="background: #28a745; padding: 5px 10px; border-radius: 4px; color: white;">{{ appointment.status }}</span></td>
+                        <td class="action-links">
+                            <a href="{% url 'mark_serving' appointment.id %}" class="btn btn-success">Start Serving</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p style="text-align: center; color: #666; padding: 20px;">No approved appointments</p>
+    {% endif %}
+{% endblock %}

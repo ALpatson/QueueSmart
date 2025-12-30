@@ -1,0 +1,33 @@
+{% extends 'appointments/base.html' %}
+
+{% block title %}Book Appointment - QueueSmart{% endblock %}
+
+{% block content %}
+    <h2>Book an Appointment</h2>
+    
+    <form method="POST" style="max-width: 600px;">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="service">Select Service</label>
+            {{ form.service }}
+        </div>
+        
+        <div class="form-group">
+            <label for="appointment_date">Date</label>
+            {{ form.appointment_date }}
+        </div>
+        
+        <div class="form-group">
+            <label for="appointment_time">Time</label>
+            {{ form.appointment_time }}
+        </div>
+        
+        <div class="form-group">
+            <label for="notes">Additional Notes (Optional)</label>
+            {{ form.notes }}
+        </div>
+        
+        <button type="submit">Book Appointment</button>
+    </form>
+{% endblock %}
