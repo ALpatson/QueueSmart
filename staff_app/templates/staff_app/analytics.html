@@ -1,0 +1,400 @@
+{% extends 'appointments/base.html' %}
+{% block title %}Staff Analytics - QueueSmart{% endblock %}
+
+{% block content %}
+<style>
+    .analytics-header {
+        margin-bottom: 40px;
+    }
+
+    .analytics-header h1 {
+        color: #333;
+        font-size: 32px;
+        margin-bottom: 5px;
+    }
+
+    .analytics-date {
+        color: #999;
+        font-size: 14px;
+    }
+
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        margin-bottom: 50px;
+    }
+
+    .metric-card {
+        background: white;
+        padding: 35px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .metric-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .metric-label {
+        color: #999;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 15px;
+    }
+
+    .metric-value {
+        font-size: 48px;
+        font-weight: 700;
+        color: #667eea;
+        margin: 0;
+    }
+
+    .metric-value.completed {
+        color: #28a745;
+    }
+
+    .metric-value.today {
+        color: #ffc107;
+    }
+
+    .metric-value.time {
+        color: #17a2b8;
+    }
+
+    /* Schedule Section */
+    .schedule-section {
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .schedule-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .schedule-header h2 {
+        margin: 0;
+        color: #333;
+        font-size: 28px;
+    }
+
+    .schedule-header-icon {
+        font-size: 32px;
+    }
+
+    /* Schedule Status Sections */
+    .schedule-status {
+        margin-bottom: 35px;
+    }
+
+    .status-title {
+        color: #333;
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        padding-left: 15px;
+        border-left: 4px solid #667eea;
+    }
+
+    .status-title.pending {
+        border-left-color: #ffc107;
+    }
+
+    .status-title.approved {
+        border-left-color: #17a2b8;
+    }
+
+    .status-title.serving {
+        border-left-color: #28a745;
+    }
+
+    .status-title.completed {
+        border-left-color: #6c757d;
+    }
+
+    .appointment-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .appointment-item {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 20px;
+        transition: all 0.3s ease;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .appointment-item:hover {
+        border-color: #667eea;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+        transform: translateX(5px);
+    }
+
+    .appointment-item.pending {
+        border-left: 5px solid #ffc107;
+    }
+
+    .appointment-item.approved {
+        border-left: 5px solid #17a2b8;
+    }
+
+    .appointment-item.serving {
+        border-left: 5px solid #28a745;
+        background: linear-gradient(135deg, #d4edda 0%, #ffffff 100%);
+    }
+
+    .appointment-item.completed {
+        border-left: 5px solid #6c757d;
+        opacity: 0.8;
+    }
+
+    .appointment-info {
+        flex: 1;
+    }
+
+    .appointment-client {
+        font-size: 16px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .appointment-details {
+        display: flex;
+        gap: 20px;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .appointment-time {
+        background: #667eea;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 14px;
+        min-width: 80px;
+        text-align: center;
+    }
+
+    .appointment-queue {
+        background: #ffc107;
+        color: #000;
+        padding: 8px 16px;
+        border-radius: 25px;
+        font-weight: 700;
+        font-size: 14px;
+        min-width: 60px;
+        text-align: center;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+    }
+
+    .empty-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+
+    .empty-text {
+        color: #999;
+        font-size: 16px;
+    }
+
+    @media (max-width: 768px) {
+        .metrics-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .schedule-section {
+            padding: 20px;
+        }
+
+        .appointment-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .appointment-details {
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+    }
+</style>
+
+<div class="analytics-header">
+    <h1>📊 Analytics Dashboard</h1>
+    <p class="analytics-date">Today: {{ today }}</p>
+</div>
+
+<!-- Metrics Grid -->
+<div class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-label">Total Appointments</div>
+        <p class="metric-value">{{ analytics.total_appointments }}</p>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-label">Completed</div>
+        <p class="metric-value completed">{{ analytics.completed_appointments }}</p>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-label">Today's Appointments</div>
+        <p class="metric-value today">{{ analytics.todays_appointments }}</p>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-label">Avg Wait Time</div>
+        <p class="metric-value time">{{ analytics.avg_wait_time }}h</p>
+    </div>
+</div>
+
+<!-- Schedule Section -->
+<div class="schedule-section">
+    <div class="schedule-header">
+        <div class="schedule-header-icon">📅</div>
+        <h2>Today's Schedule</h2>
+    </div>
+
+    <!-- Pending Approval -->
+    {% if schedule.pending %}
+        <div class="schedule-status">
+            <h3 class="status-title pending">⏳ Pending Approval</h3>
+            <div class="appointment-list">
+                {% for app in schedule.pending %}
+                    <div class="appointment-item pending">
+                        <div class="appointment-info">
+                            <div class="appointment-client">{{ app.client }}</div>
+                            <div class="appointment-details">
+                                <div class="detail-item">
+                                    💼 <strong>{{ app.service }}</strong>
+                                </div>
+                                <div class="detail-item">
+                                    ⏰ {{ app.time }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="appointment-time">{{ app.time }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- In Queue (Approved) -->
+    {% if schedule.approved %}
+        <div class="schedule-status">
+            <h3 class="status-title approved">✅ In Queue</h3>
+            <div class="appointment-list">
+                {% for app in schedule.approved %}
+                    <div class="appointment-item approved">
+                        <div class="appointment-info">
+                            <div class="appointment-client">{{ app.client }}</div>
+                            <div class="appointment-details">
+                                <div class="detail-item">
+                                    💼 <strong>{{ app.service }}</strong>
+                                </div>
+                                <div class="detail-item">
+                                    ⏰ {{ app.time }}
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div class="appointment-queue">#{{ app.queue_number }}</div>
+                            <div class="appointment-time">{{ app.time }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Now Serving -->
+    {% if schedule.serving %}
+        <div class="schedule-status">
+            <h3 class="status-title serving">🎯 Now Serving</h3>
+            <div class="appointment-list">
+                <div class="appointment-item serving">
+                    <div class="appointment-info">
+                        <div class="appointment-client">{{ schedule.serving.client }}</div>
+                        <div class="appointment-details">
+                            <div class="detail-item">
+                                💼 <strong>{{ schedule.serving.service }}</strong>
+                            </div>
+                            <div class="detail-item">
+                                ⏰ {{ schedule.serving.time }}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <div class="appointment-queue" style="background: #28a745; color: white;">#{{ schedule.serving.queue_number }}</div>
+                        <div class="appointment-time" style="background: #28a745;">{{ schedule.serving.time }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Completed -->
+    {% if schedule.completed %}
+        <div class="schedule-status">
+            <h3 class="status-title completed">✓ Completed</h3>
+            <div class="appointment-list">
+                {% for app in schedule.completed %}
+                    <div class="appointment-item completed">
+                        <div class="appointment-info">
+                            <div class="appointment-client">{{ app.client }}</div>
+                            <div class="appointment-details">
+                                <div class="detail-item">
+                                    💼 <strong>{{ app.service }}</strong>
+                                </div>
+                                <div class="detail-item">
+                                    ⏰ {{ app.time }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="appointment-time" style="background: #6c757d;">{{ app.time }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- If no appointments today -->
+    {% if not schedule.pending and not schedule.approved and not schedule.serving and not schedule.completed %}
+        <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <p class="empty-text">No appointments scheduled for today</p>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

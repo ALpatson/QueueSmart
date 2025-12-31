@@ -1,0 +1,33 @@
+{% extends 'appointments/base.html' %}
+{% block title %}My Analytics - Dashboard{% endblock %}
+{% block content %}
+
+<div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+    <h1>📊 Your Appointment Statistics</h1>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h3 style="color: #666; margin: 0 0 10px 0; font-size: 14px;">Total Appointments</h3>
+            <p style="font-size: 32px; font-weight: bold; margin: 0; color: #007bff;">{{ analytics.total_appointments }}</p>
+        </div>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h3 style="color: #666; margin: 0 0 10px 0; font-size: 14px;">Completed</h3>
+            <p style="font-size: 32px; font-weight: bold; margin: 0; color: #28a745;">{{ analytics.completed_appointments }}</p>
+        </div>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h3 style="color: #666; margin: 0 0 10px 0; font-size: 14px;">Upcoming</h3>
+            <p style="font-size: 32px; font-weight: bold; margin: 0; color: #ff9800;">{{ analytics.upcoming_appointments }}</p>
+        </div>
+    </div>
+    
+    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h2>📈 Your Stats</h2>
+        <p><strong>Rejected Appointments:</strong> {{ analytics.rejected_appointments }}</p>
+        <p><strong>Most Booked Service:</strong> {{ analytics.most_booked_service }}</p>
+        <p><strong>Avg Time to Complete:</strong> {{ analytics.avg_completion_time }} hours</p>
+    </div>
+</div>
+
+{% endblock %}

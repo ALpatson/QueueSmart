@@ -10,351 +10,559 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 0;
         }
-        
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.25);
-            overflow: hidden;
-        }
-        
+
         header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 25px 20px;
-            text-align: center;
+            padding: 20px 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        
-        header h1 {
-            font-size: 1.8em;
-            margin-bottom: 5px;
-        }
-        
-        header p {
-            font-size: 0.95em;
-            opacity: 0.9;
-        }
-        
-        nav {
-            background: #f8f9fa;
-            padding: 12px 20px;
-            border-bottom: 1px solid #e0e0e0;
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        nav a {
-            text-decoration: none;
-            color: #667eea;
-            font-weight: 600;
-            padding: 8px 16px;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-            font-size: 0.9em;
-        }
-        
-        nav a:hover {
-            background: #667eea;
-            color: white;
-        }
-        
-        .content {
-            padding: 30px 20px;
-        }
-        
-        .messages {
-            margin-bottom: 20px;
-        }
-        
-        .messages p {
-            padding: 12px 15px;
-            margin-bottom: 10px;
-            border-radius: 6px;
-            background: #d4edda;
-            border-left: 4px solid #28a745;
-            color: #155724;
-            font-size: 0.95em;
-        }
-        
-        .messages .error {
-            background: #f8d7da;
-            border-left-color: #dc3545;
-            color: #721c24;
-        }
-        
-        h2 {
-            color: #667eea;
-            margin: 20px 0 15px 0;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #667eea;
-            font-size: 1.4em;
-        }
-        
-        .form-container {
-            max-width: 450px;
+
+        .header-content {
+            max-width: 1400px;
             margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        
-        .form-group {
-            margin-bottom: 18px;
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
-        
-        label {
-            display: block;
-            margin-bottom: 6px;
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .user-greeting {
+            font-size: 14px;
+            opacity: 0.9;
             font-weight: 600;
-            color: #333;
-            font-size: 0.9em;
         }
-        
-        input, select, textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1.5px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 0.95em;
-            font-family: inherit;
-            transition: all 0.3s ease;
+
+        .header-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
         }
-        
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 8px rgba(102, 126, 234, 0.2);
-        }
-        
-        button, .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+
+        .nav-btn {
             padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95em;
-            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
             text-decoration: none;
-            display: inline-block;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
         }
-        
-        button:hover, .btn:hover {
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Notification Button Styling */
+        .notification-button {
+            position: relative;
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
+        }
+
+        .notification-button:hover {
+            background: linear-gradient(135deg, #138496 0%, #0d6674 100%);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 6px 16px rgba(23, 162, 184, 0.4);
         }
-        
-        button:active {
+
+        .notification-button:active {
             transform: translateY(0);
         }
-        
-        .btn-danger {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-        }
-        
-        .btn-success {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        }
-        
-        .login-link {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 0.9em;
-        }
-        
-        .login-link a {
-            color: #667eea;
-            font-weight: 600;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-            background: white;
-            border-radius: 6px;
-            font-size: 0.9em;
-            overflow: hidden;
-        }
-        
-        table th {
-            background: #667eea;
-            color: white;
-            padding: 10px 12px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 0.85em;
-        }
-        
-        table td {
-            padding: 10px 12px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        table tr:hover {
-            background: #f9f9f9;
-        }
-        
-        .action-links {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-        
-        .action-links a {
-            padding: 6px 10px;
-            background: #667eea;
-            color: white;
-            border-radius: 4px;
-            font-size: 0.8em;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        
-        .action-links a:hover {
-            transform: translateY(-1px);
-        }
-        
-        .action-links .btn-danger {
+
+        /* Badge Styling */
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
             background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
         }
-        
-        .action-links .btn-success {
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 8px rgba(220, 53, 69, 0.3);
+            }
+        }
+
+        /* Modal Styling */
+        .notification-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .notification-modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #333;
+            font-size: 24px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        /* Notification Items */
+        .notification-item {
+            background: white;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid #17a2b8;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .notification-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateX(4px);
+        }
+
+        .notification-item.confirmation {
+            border-left-color: #28a745;
+        }
+
+        .notification-item.approval {
+            border-left-color: #17a2b8;
+        }
+
+        .notification-item.rejection {
+            border-left-color: #dc3545;
+        }
+
+        .notification-item.reminder {
+            border-left-color: #ffc107;
+        }
+
+        .notification-type {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .notification-type.confirmation {
             background: #28a745;
         }
-        
-        .currently-serving {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-            border-left: 5px solid #1eae67;
+
+        .notification-type.approval {
+            background: #17a2b8;
         }
-        
-        .currently-serving h2 {
+
+        .notification-type.rejection {
+            background: #dc3545;
+        }
+
+        .notification-type.reminder {
+            background: #ffc107;
+            color: black;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-message {
+            color: #333;
+            margin: 8px 0;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .notification-time {
+            color: #999;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        .delete-btn {
+            background: #dc3545;
             color: white;
             border: none;
-            margin: 0 0 10px 0;
-            font-size: 1.2em;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+            white-space: nowrap;
         }
-        
-        .currently-serving p {
-            margin: 5px 0;
-            font-size: 0.95em;
+
+        .delete-btn:hover {
+            background: #c82333;
         }
-        
-        .no-serving {
-            background: linear-gradient(135deg, #fd7e14 0%, #ff6b6b 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+
+        .empty-notifications {
             text-align: center;
-            border-left: 5px solid #ff5252;
+            padding: 40px;
+            color: #999;
         }
-        
-        .no-serving h2 {
-            color: white;
-            border: none;
-            margin: 0 0 10px 0;
-            font-size: 1.2em;
+
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
         }
-        
+
+        .messages {
+            margin-bottom: 30px;
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-weight: 500;
+            animation: slideDown 0.5s ease;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         footer {
             background: #f8f9fa;
-            padding: 15px 20px;
-            text-align: center;
-            border-top: 1px solid #e0e0e0;
-            color: #999;
-            font-size: 0.85em;
-        }
-        
-        a {
-            color: #667eea;
-            text-decoration: none;
-        }
-        
-        a:hover {
-            text-decoration: underline;
-        }
-        
-        .no-data {
-            text-align: center;
-            color: #999;
             padding: 20px;
-            font-size: 0.95em;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 60px;
         }
-        
-        @media (max-width: 600px) {
-            header h1 {
-                font-size: 1.5em;
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
             }
-            
-            .content {
+
+            .header-right {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .main-content {
                 padding: 20px 15px;
             }
-            
-            h2 {
-                font-size: 1.2em;
-            }
-            
-            table {
-                font-size: 0.85em;
-            }
-            
-            table th, table td {
-                padding: 8px 10px;
+
+            .user-greeting {
+                order: -1;
+                width: 100%;
+                text-align: center;
+                margin-bottom: 10px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🎫 QueueSmart</h1>
-            <p>Smart Appointment & Queue Management</p>
-        </header>
-        
-        <nav>
-            {% if request.session.user_role == 'client' %}
-                <a href="{% url 'book_appointment' %}">📅 Book</a>
-                <a href="{% url 'login' %}">🚪 Logout</a>
-            {% elif request.session.user_role == 'staff' or request.session.user_role == 'admin' %}
-                <a href="{% url 'staff_dashboard' %}">📊 Dashboard</a>
-                <a href="{% url 'login' %}">🚪 Logout</a>
-            {% else %}
-                <a href="{% url 'registration' %}">✍️ Register</a>
-                <a href="{% url 'login' %}">🔓 Login</a>
-            {% endif %}
-        </nav>
-        
-        <div class="content">
-            {% if messages %}
-                <div class="messages">
-                    {% for message in messages %}
-                        <p class="{% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</p>
-                    {% endfor %}
-                </div>
-            {% endif %}
-            
-            {% block content %}{% endblock %}
+    <header>
+        <div class="header-content">
+            <div class="header-left">
+                <div class="logo-text">QueueSmart</div>
+                {% if request.session.user_role == 'client' %}
+                    <div class="user-greeting">Hi {{ user_first_name }}! 👋</div>
+                {% elif request.session.user_role == 'staff' %}
+                    <div class="user-greeting">Hi {{ user_first_name }}! 👋</div>
+                {% elif request.session.user_role == 'admin' %}
+                    <div class="user-greeting">Hi {{ user_first_name }}! 👋</div>
+                {% endif %}
+            </div>
+            <div class="header-right">
+                {% if request.session.user_role == 'admin' %}
+                    <a href="{% url 'admin_dashboard' %}" class="nav-btn">Dashboard</a>
+                    <a href="{% url 'admin_logout' %}" class="nav-btn">Logout</a>
+                {% elif request.session.user_role == 'staff' %}
+                    <button class="notification-button" onclick="openNotificationModal()">
+                        🔔 Notifications
+                        <span class="notification-badge" id="badge" {% if unread_count == 0 %}style="display: none;"{% endif %}>
+                            {{ unread_count }}
+                        </span>
+                    </button>
+                    <a href="{% url 'staff_dashboard' %}" class="nav-btn">Dashboard</a>
+                    <a href="{% url 'staff_logout' %}" class="nav-btn">Logout</a>
+                {% elif request.session.user_role == 'client' %}
+                    <button class="notification-button" onclick="openNotificationModal()">
+                        🔔 Notifications
+                        <span class="notification-badge" id="badge" {% if unread_count == 0 %}style="display: none;"{% endif %}>
+                            {{ unread_count }}
+                        </span>
+                    </button>
+                    <a href="{% url 'client_dashboard' %}" class="nav-btn">My Appointments</a>
+                    <a href="{% url 'client_logout' %}" class="nav-btn">Logout</a>
+                {% else %}
+                    <a href="/" class="nav-btn">Home</a>
+                {% endif %}
+            </div>
         </div>
-        
-        <footer>
-            <p>&copy; 2025 QueueSmart | Smart Queue Management System</p>
-        </footer>
+    </header>
+
+    <div class="main-content">
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}success{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
     </div>
+
+    <!-- Notification Modal Pop-up -->
+    <div id="notificationModal" class="notification-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔔 Notifications</h2>
+                <button class="close-btn" onclick="closeNotificationModal()">&times;</button>
+            </div>
+            
+            <div id="notificationsList">
+                <!-- Notifications will load here -->
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 QueueSmart. Smart Appointment & Queue Management System</p>
+    </footer>
+
+    <script>
+        function openNotificationModal() {
+            const modal = document.getElementById('notificationModal');
+            modal.classList.add('show');
+            loadNotifications();
+            
+            // Mark all notifications as read when modal opens
+            markAllAsRead();
+        }
+
+        function closeNotificationModal() {
+            const modal = document.getElementById('notificationModal');
+            modal.classList.remove('show');
+        }
+
+        function loadNotifications() {
+            const notifications = {{ notifications_json|safe }};
+            const list = document.getElementById('notificationsList');
+            
+            if (notifications.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-notifications">
+                        <div style="font-size: 48px; margin-bottom: 15px;">📭</div>
+                        <p>No notifications yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = notifications.map(notif => `
+                <div class="notification-item ${notif.type}">
+                    <div class="notification-content">
+                        <div class="notification-type ${notif.type}">${notif.type.toUpperCase()}</div>
+                        <div style="font-weight: bold; color: #333; margin-bottom: 5px;">${notif.title}</div>
+                        <div class="notification-message">${notif.message}</div>
+                        <div class="notification-time">${notif.time}</div>
+                    </div>
+                    <button class="delete-btn" onclick="deleteNotification(${notif.id})">✕ Delete</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteNotification(id) {
+            fetch(`/notifications/delete/${id}/`, {
+                method: 'GET',
+            }).then(response => {
+                loadNotifications();
+                location.reload();
+            });
+        }
+
+        function markAllAsRead() {
+            // Hide badge when user opens the modal
+            const badge = document.getElementById('badge');
+            if (badge) {
+                badge.style.display = 'none';
+            }
+            
+            // Call Django view to mark all as read
+            fetch('/notifications/mark-as-read/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+            }).catch(err => console.log('Marked as read'));
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('notificationModal');
+            if (event.target === modal) {
+                modal.classList.remove('show');
+            }
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeNotificationModal();
+            }
+        });
+    </script>
 </body>
 </html>

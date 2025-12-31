@@ -1,0 +1,375 @@
+{% extends 'appointments/base.html' %}
+{% block title %}Staff Dashboard - QueueSmart{% endblock %}
+{% block content %}
+
+<style>
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .dashboard-header h1 {
+        color: #333;
+        margin: 0;
+    }
+
+    .dashboard-header p {
+        color: #666;
+        margin: 5px 0 0 0;
+    }
+
+    .manage-btn {
+        background: #17a2b8;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .manage-btn:hover {
+        background: #138496;
+    }
+
+    .now-serving {
+        background: #28a745;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .now-serving-content {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+    }
+
+    .now-serving-label {
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.9;
+    }
+
+    .now-serving-details {
+        display: flex;
+        gap: 40px;
+        align-items: center;
+    }
+
+    .now-serving-queue {
+        font-size: 36px;
+        font-weight: bold;
+    }
+
+    .now-serving-info {
+        display: flex;
+        gap: 20px;
+        font-size: 15px;
+    }
+
+    .now-serving-info div {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .now-serving-info span:first-child {
+        font-weight: bold;
+        margin-bottom: 3px;
+    }
+
+    .now-serving-info span:last-child {
+        opacity: 0.9;
+    }
+
+    .now-serving-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .complete-btn {
+        background: #ff6b6b;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.3s;
+    }
+
+    .complete-btn:hover {
+        background: #ee5a52;
+    }
+
+    .empty-serving {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 8px;
+        text-align: center;
+        color: #666;
+        margin-bottom: 30px;
+    }
+
+    .section {
+        background: white;
+        padding: 25px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .badge {
+        background: #28a745;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .badge.pending {
+        background: #ffc107;
+        color: black;
+    }
+
+    .badge.approved {
+        background: #17a2b8;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead {
+        background: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    th {
+        padding: 12px;
+        text-align: left;
+        font-weight: bold;
+        color: #666;
+        text-transform: uppercase;
+        font-size: 12px;
+    }
+
+    td {
+        padding: 12px;
+        border-bottom: 1px solid #dee2e6;
+        color: #333;
+    }
+
+    tr:hover {
+        background: #f8f9fa;
+    }
+
+    .action-links {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: bold;
+        text-decoration: none;
+        display: inline-block;
+        transition: opacity 0.2s;
+    }
+
+    .btn:hover {
+        opacity: 0.8;
+    }
+
+    .btn-success {
+        background: #28a745;
+        color: white;
+    }
+
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+    }
+
+    .empty-state p {
+        margin: 10px 0;
+        font-size: 16px;
+    }
+</style>
+
+<div class="dashboard-header">
+    <div>
+        <h1>👤 Staff Dashboard</h1>
+        <p>Manage appointments and serve customers</p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="{% url 'staff_availability' %}" class="manage-btn">📅 Manage My Availability</a>
+        <a href="{% url 'staff_analytics' %}" class="manage-btn" style="background: #17a2b8;">📊 Analytics</a>
+        
+    </div>
+</div>
+
+    <!-- NOW SERVING SECTION -->
+    {% if serving %}
+        <div class="now-serving">
+            <div class="now-serving-content">
+                <div>
+                    <div class="now-serving-label">Now Serving</div>
+                </div>
+                <div class="now-serving-details">
+                    <div class="now-serving-queue">Queue #{{ serving.queue_number }}</div>
+                    <div class="now-serving-info">
+                        <div>
+                            <span>Client Name</span>
+                            <span>{{ serving.client.first_name }} {{ serving.client.last_name }}</span>
+                        </div>
+                        <div>
+                            <span>Service</span>
+                            <span>{{ serving.service.name }}</span>
+                        </div>
+                        <div>
+                            <span>Time</span>
+                            <span>{{ serving.appointment_time|time:"H:i" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="now-serving-actions">
+                <a href="{% url 'staff_complete' serving.id %}" class="complete-btn">✓ Complete</a>
+            </div>
+        </div>
+    {% else %}
+        <div class="empty-serving">
+            <p>No one is currently being served</p>
+        </div>
+    {% endif %}
+
+    <!-- PENDING APPOINTMENTS -->
+    <div class="section">
+        <div class="section-title">
+            Pending Appointments
+            {% if pending.count > 0 %}
+                <span class="badge pending">{{ pending.count }} Waiting</span>
+            {% endif %}
+        </div>
+        
+        {% if pending %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Client</th>
+                        <th>Service</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in pending %}
+                        <tr>
+                            <td>{{ appointment.client.first_name }} {{ appointment.client.last_name }}</td>
+                            <td>{{ appointment.service.name }}</td>
+                            <td>{{ appointment.appointment_date|date:"M d, Y" }}</td>
+                            <td>{{ appointment.appointment_time|time:"H:i" }}</td>
+                            <td>
+                                <div class="action-links">
+                                    <a href="{% url 'staff_approve' appointment.id %}" class="btn btn-success">Approve</a>
+                                    <a href="{% url 'staff_reject' appointment.id %}" class="btn btn-danger">Reject</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="empty-state">
+                <p>No pending appointments</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- APPROVED QUEUE -->
+    <div class="section">
+        <div class="section-title">
+            Approved Queue
+            {% if approved.count > 0 %}
+                <span class="badge approved">{{ approved.count }} in Queue</span>
+            {% endif %}
+        </div>
+        
+        {% if approved %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Queue #</th>
+                        <th>Client</th>
+                        <th>Service</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in approved %}
+                        <tr>
+                            <td><strong>#{{ appointment.queue_number }}</strong></td>
+                            <td>{{ appointment.client.first_name }} {{ appointment.client.last_name }}</td>
+                            <td>{{ appointment.service.name }}</td>
+                            <td>{{ appointment.appointment_date|date:"M d, Y" }}</td>
+                            <td>{{ appointment.appointment_time|time:"H:i" }}</td>
+                            <td>
+                                <div class="action-links">
+                                    <a href="{% url 'staff_serving' appointment.id %}" class="btn btn-success">Start Serving</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="empty-state">
+                <p>No approved appointments in queue</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

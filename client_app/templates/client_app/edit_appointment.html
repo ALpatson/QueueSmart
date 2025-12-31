@@ -1,0 +1,224 @@
+{% extends 'appointments/base.html' %}
+{% block title %}Edit Appointment - QueueSmart{% endblock %}
+
+{% block content %}
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .form-card {
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding-bottom: 25px;
+        border-bottom: 2px solid #fd7e14;
+    }
+
+    .form-header h1 {
+        color: #333;
+        font-size: 28px;
+        margin-bottom: 10px;
+    }
+
+    .form-header p {
+        color: #666;
+        font-size: 16px;
+    }
+
+    .appointment-info {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        border-left: 4px solid #fd7e14;
+    }
+
+    .appointment-info p {
+        margin: 8px 0;
+        color: #666;
+        font-size: 14px;
+    }
+
+    .appointment-info strong {
+        color: #333;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 10px;
+        color: #333;
+        font-weight: 600;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 15px;
+        font-family: inherit;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.8);
+    }
+
+    input:focus, select:focus {
+        outline: none;
+        border-color: #fd7e14;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(253, 126, 20, 0.1);
+    }
+
+    .button-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    button {
+        padding: 16px;
+        border: none;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-update {
+        background: linear-gradient(135deg, #fd7e14 0%, #ff6b6b 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(253, 126, 20, 0.3);
+    }
+
+    .btn-update:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(253, 126, 20, 0.4);
+    }
+
+    .btn-cancel {
+        background: #6c757d;
+        color: white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-cancel:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+    }
+
+    .messages {
+        margin-bottom: 25px;
+    }
+
+    .alert {
+        padding: 14px 16px;
+        border-radius: 10px;
+        font-size: 14px;
+        animation: slideDown 0.5s ease;
+    }
+
+    .alert-error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .form-card {
+            padding: 25px;
+        }
+
+        .button-group {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="form-container">
+    <div class="form-card">
+        <div class="form-header">
+            <h1>Edit Appointment</h1>
+            <p>Update your booking details</p>
+        </div>
+
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}error{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="appointment-info">
+            <p><strong>Service:</strong> {{ appointment.service.name }}</p>
+            <p><strong>Current Date:</strong> {{ appointment.appointment_date|date:"M d, Y" }}</p>
+            <p><strong>Current Time:</strong> {{ appointment.appointment_time|time:"H:i" }}</p>
+            <p><strong>Status:</strong> {{ appointment.status|upper }}</p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="service">Service</label>
+                <select id="service" name="service" required>
+                    {% for service in services %}
+                        <option value="{{ service.id }}" {% if service.id == appointment.service.id %}selected{% endif %}>
+                            {{ service.name }} ({{ service.duration }} mins)
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="appointment_date">New Date</label>
+                <input type="date" id="appointment_date" name="appointment_date" 
+                       value="{{ appointment.appointment_date|date:'Y-m-d' }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="appointment_time">New Time</label>
+                <input type="time" id="appointment_time" name="appointment_time" 
+                       value="{{ appointment.appointment_time|time:'H:i' }}" required>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn-update">Update Appointment</button>
+                <a href="{% url 'client_dashboard' %}" class="btn-cancel" style="text-align: center; display: flex; align-items: center; justify-content: center; text-decoration: none;">Back</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,334 @@
+{% extends 'appointments/base.html' %}
+{% block title %}Book Appointment - QueueSmart{% endblock %}
+{% block content %}
+
+<style>
+    .booking-container {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .booking-card {
+        background: white;
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .booking-card h1 {
+        color: #ff9800;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    .booking-card p {
+        text-align: center;
+        color: #666;
+        margin-bottom: 30px;
+    }
+    .form-group {
+        margin-bottom: 25px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #333;
+        font-size: 15px;
+    }
+    .form-group label .required {
+        color: red;
+    }
+    .form-group select, .form-group input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 15px;
+        box-sizing: border-box;
+    }
+    .form-group select:focus, .form-group input:focus {
+        outline: none;
+        border-color: #ff9800;
+        box-shadow: 0 0 5px rgba(255, 152, 0, 0.3);
+    }
+    .form-group select:disabled {
+        background-color: #f5f5f5;
+        cursor: not-allowed;
+        color: #999;
+    }
+    .info-text {
+        padding: 12px;
+        margin-top: 8px;
+        border-left: 4px solid #ff9800;
+        background: #fff9f0;
+        border-radius: 4px;
+        font-size: 13px;
+        color: #666;
+    }
+    .info-text.success {
+        border-left-color: #28a745;
+        background: #f0fff4;
+        color: #155724;
+    }
+    .info-text.error {
+        border-left-color: #dc3545;
+        background: #fff5f5;
+        color: #721c24;
+    }
+    .info-text.warning {
+        border-left-color: #ffc107;
+        background: #fffef0;
+        color: #856404;
+    }
+    .submit-btn {
+        width: 100%;
+        padding: 15px;
+        background: #ff9800;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+    .submit-btn:hover:not(:disabled) {
+        background: #e68900;
+    }
+    .submit-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+    .back-link {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .back-link a {
+        color: #ff9800;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .back-link a:hover {
+        text-decoration: underline;
+    }
+    .no-availability {
+        text-align: center;
+        padding: 40px;
+        background: #fff5f5;
+        border-radius: 8px;
+        border-left: 4px solid #dc3545;
+    }
+    .no-availability p {
+        color: #721c24;
+        margin: 20px 0;
+    }
+</style>
+
+<div class="booking-container">
+    {% if no_available_dates %}
+        <div class="no-availability">
+            <h2>📅 No Available Appointments</h2>
+            <p>There are currently no available time slots. Please check back later.</p>
+            <div class="back-link">
+                <a href="/client/dashboard/">← Back to Dashboard</a>
+            </div>
+        </div>
+    {% else %}
+        <div class="booking-card">
+            <h1>📅 Book Your Appointment</h1>
+            <p>Select a service, staff member, and available time slot</p>
+
+            <form method="POST" id="bookingForm">
+                {% csrf_token %}
+
+                <!-- Service Selection -->
+                <div class="form-group">
+                    <label>Select Service <span class="required">*</span></label>
+                    <select name="service_id" id="serviceSelect" required onchange="updateStaff()">
+                        <option value="">-- Choose a service --</option>
+                        {% for service in services %}
+                            <option value="{{ service.id }}">{{ service.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="info-text">🔍 Select the service you need.</div>
+                </div>
+
+                <!-- Staff Selection -->
+                <div class="form-group">
+                    <label>Select Staff Member <span class="required">*</span></label>
+                    <select name="staff_id" id="staffSelect" required onchange="updateDates()" disabled>
+                        <option value="">-- Choose staff member --</option>
+                    </select>
+                    <div class="info-text">👤 Choose which staff member you prefer.</div>
+                </div>
+
+                <!-- Date Selection -->
+                <div class="form-group">
+                    <label>Select Date <span class="required">*</span></label>
+                    <select name="appointment_date" id="dateSelect" required onchange="updateTimeSlots()" disabled>
+                        <option value="">-- Select a date --</option>
+                    </select>
+                    <div class="info-text success" id="dateInfo" style="display:none;">✓ These are the available dates for the selected staff member.</div>
+                    <div class="info-text error" id="noDateInfo" style="display:none;">⚠ No available dates for this staff member.</div>
+                </div>
+
+                <!-- Time Slot Selection -->
+                <div class="form-group">
+                    <label>Select Time Slot <span class="required">*</span></label>
+                    <select name="appointment_time" id="timeSelect" required disabled>
+                        <option value="">-- Select a date first --</option>
+                    </select>
+                    <div class="info-text success" id="timeInfo" style="display:none;">⏰ Available time slots for the selected date.</div>
+                    <div class="info-text error" id="noTimeInfo" style="display:none;">⚠ No available time slots for this date.</div>
+                </div>
+
+                <button type="submit" class="submit-btn">Book Appointment</button>
+            </form>
+
+            <div class="back-link">
+                <a href="/client/dashboard/">← Back to Dashboard</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    // Parse staff by service from Django
+    const staffByService = {{ staff_by_service|safe }};
+    
+    // Parse available dates by staff
+    const availableDatesByStaff = {};
+    {% for staff_id, dates_json in available_dates_by_staff.items %}
+        availableDatesByStaff[{{ staff_id }}] = {{ dates_json|safe }};
+    {% endfor %}
+    
+    // Parse time slots by staff and date
+    const timeSlotsByStaffDate = {};
+    {% for key, slots_json in time_slots_by_staff_date.items %}
+        timeSlotsByStaffDate["{{ key }}"] = {{ slots_json|safe }};
+    {% endfor %}
+
+    function updateStaff() {
+        const serviceId = document.getElementById('serviceSelect').value;
+        const staffSelect = document.getElementById('staffSelect');
+        const dateSelect = document.getElementById('dateSelect');
+        const timeSelect = document.getElementById('timeSelect');
+
+        // Reset dependent selects
+        staffSelect.innerHTML = '<option value="">-- Choose staff member --</option>';
+        dateSelect.innerHTML = '<option value="">-- Select a date --</option>';
+        timeSelect.innerHTML = '<option value="">-- Select a date first --</option>';
+        dateSelect.disabled = true;
+        timeSelect.disabled = true;
+        document.getElementById('dateInfo').style.display = 'none';
+        document.getElementById('noDateInfo').style.display = 'none';
+        document.getElementById('timeInfo').style.display = 'none';
+        document.getElementById('noTimeInfo').style.display = 'none';
+
+        if (!serviceId) {
+            staffSelect.disabled = true;
+            return;
+        }
+
+        // Get staff for this service
+        const staffList = staffByService[serviceId] || [];
+        
+        if (staffList.length === 0) {
+            staffSelect.disabled = true;
+            document.getElementById('noDateInfo').style.display = 'block';
+            document.getElementById('noDateInfo').textContent = '⚠ No staff members available for this service.';
+            return;
+        }
+
+        staffList.forEach(function(staff) {
+            const option = document.createElement('option');
+            option.value = staff.id;
+            option.textContent = staff.name;
+            staffSelect.appendChild(option);
+        });
+
+        staffSelect.disabled = false;
+    }
+
+    function updateDates() {
+        const staffId = document.getElementById('staffSelect').value;
+        const dateSelect = document.getElementById('dateSelect');
+        const timeSelect = document.getElementById('timeSelect');
+
+        // Reset time select
+        timeSelect.innerHTML = '<option value="">-- Select a date first --</option>';
+        timeSelect.disabled = true;
+        document.getElementById('dateInfo').style.display = 'none';
+        document.getElementById('noDateInfo').style.display = 'none';
+        document.getElementById('timeInfo').style.display = 'none';
+        document.getElementById('noTimeInfo').style.display = 'none';
+
+        if (!staffId) {
+            dateSelect.disabled = true;
+            return;
+        }
+
+        // Get available dates for this staff member
+        const availableDates = availableDatesByStaff[staffId] || [];
+
+        if (availableDates.length === 0) {
+            dateSelect.innerHTML = '<option value="">-- No available dates --</option>';
+            dateSelect.disabled = true;
+            document.getElementById('noDateInfo').style.display = 'block';
+            return;
+        }
+
+        dateSelect.innerHTML = '<option value="">-- Select a date --</option>';
+        availableDates.forEach(function(date) {
+            const dateObj = new Date(date + 'T00:00:00');
+            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+            const dateStr = dateObj.toLocaleDateString('en-US', options);
+            
+            const option = document.createElement('option');
+            option.value = date;
+            option.textContent = dateStr;
+            dateSelect.appendChild(option);
+        });
+
+        dateSelect.disabled = false;
+        document.getElementById('dateInfo').style.display = 'block';
+    }
+
+    function updateTimeSlots() {
+        const staffId = document.getElementById('staffSelect').value;
+        const selectedDate = document.getElementById('dateSelect').value;
+        const timeSelect = document.getElementById('timeSelect');
+
+        document.getElementById('timeInfo').style.display = 'none';
+        document.getElementById('noTimeInfo').style.display = 'none';
+
+        if (!selectedDate) {
+            timeSelect.innerHTML = '<option value="">-- Select a date first --</option>';
+            timeSelect.disabled = true;
+            return;
+        }
+
+        // Get time slots for this staff and date
+        const dateKey = staffId + '_' + selectedDate;
+        const slots = timeSlotsByStaffDate[dateKey] || [];
+
+        if (slots.length === 0) {
+            timeSelect.innerHTML = '<option value="">-- No available times --</option>';
+            timeSelect.disabled = true;
+            document.getElementById('noTimeInfo').style.display = 'block';
+            return;
+        }
+
+        timeSelect.innerHTML = '<option value="">-- Select a time slot --</option>';
+        slots.forEach(function(slot) {
+            const option = document.createElement('option');
+            option.value = slot.start_time;
+            option.textContent = slot.start_time + ' - ' + slot.end_time;
+            timeSelect.appendChild(option);
+        });
+
+        timeSelect.disabled = false;
+        document.getElementById('timeInfo').style.display = 'block';
+    }
+</script>
+
+{% endblock %}

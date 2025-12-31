@@ -1,0 +1,206 @@
+{% extends 'appointments/base.html' %}
+{% block title %}Notifications - QueueSmart{% endblock %}
+{% block content %}
+
+<style>
+    .notifications-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .notifications-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .notifications-header h1 {
+        color: #333;
+        margin: 0;
+    }
+
+    .notification-item {
+        background: white;
+        padding: 20px;
+        margin-bottom: 15px;
+        border-left: 4px solid #17a2b8;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .notification-item.confirmation {
+        border-left-color: #28a745;
+    }
+
+    .notification-item.approval {
+        border-left-color: #17a2b8;
+    }
+
+    .notification-item.rejection {
+        border-left-color: #dc3545;
+    }
+
+    .notification-item.reminder {
+        border-left-color: #ffc107;
+    }
+
+    .notification-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 10px;
+    }
+
+    .notification-type {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+        text-transform: uppercase;
+    }
+
+    .notification-type.confirmation {
+        background: #28a745;
+    }
+
+    .notification-type.approval {
+        background: #17a2b8;
+    }
+
+    .notification-type.rejection {
+        background: #dc3545;
+    }
+
+    .notification-type.reminder {
+        background: #ffc107;
+        color: black;
+    }
+
+    .notification-time {
+        color: #999;
+        font-size: 13px;
+    }
+
+    .notification-message {
+        color: #333;
+        margin: 10px 0;
+        line-height: 1.6;
+    }
+
+    .notification-details {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 13px;
+        margin: 10px 0;
+        color: #666;
+    }
+
+    .notification-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .notification-action {
+        font-size: 12px;
+        cursor: pointer;
+        color: #17a2b8;
+        text-decoration: none;
+        border: none;
+        background: none;
+        padding: 0;
+    }
+
+    .notification-action:hover {
+        text-decoration: underline;
+    }
+
+    .notification-action.delete {
+        color: #dc3545;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+    }
+
+    .empty-state-icon {
+        font-size: 48px;
+        margin-bottom: 10px;
+    }
+
+    .empty-state p {
+        margin: 10px 0;
+        font-size: 16px;
+    }
+
+    .back-link {
+        display: inline-block;
+        background: #6c757d;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 4px;
+        text-decoration: none;
+        margin-top: 20px;
+    }
+
+    .back-link:hover {
+        background: #5a6268;
+    }
+</style>
+
+<div class="notifications-container">
+    <div class="notifications-header">
+        <h1>🔔 Notifications</h1>
+    </div>
+
+    {% if notifications %}
+        {% for notification in notifications %}
+            <div class="notification-item {{ notification.notification_type }}">
+                <div class="notification-header">
+                    <span class="notification-type {{ notification.notification_type }}">{{ notification.notification_type }}</span>
+                    <span class="notification-time">{{ notification.sent_at|date:"M d, Y H:i" }}</span>
+                </div>
+
+                <div class="notification-message">
+                    {{ notification.message }}
+                </div>
+
+                {% if notification.appointment %}
+                    <div class="notification-details">
+                        <strong>Appointment Details:</strong>
+                        <div style="margin-top: 8px;">
+                            <div>📌 Service: {{ notification.appointment.service.name }}</div>
+                            <div>📅 Date: {{ notification.appointment.appointment_date|date:"M d, Y" }}</div>
+                            <div>⏰ Time: {{ notification.appointment.appointment_time|time:"H:i" }}</div>
+                            <div>📊 Status: <strong>{{ notification.appointment.status|upper }}</strong></div>
+                            {% if notification.appointment.queue_number %}
+                                <div>🔢 Queue: #{{ notification.appointment.queue_number }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="notification-actions">
+                    <a href="{% url 'delete_notification' notification.id %}" class="notification-action delete" onclick="return confirm('Delete this notification?')">Delete</a>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <p>No notifications yet</p>
+            <p style="font-size: 14px; color: #bbb;">You'll see updates about your appointments here</p>
+        </div>
+    {% endif %}
+
+    <a href="{% url 'client_dashboard' %}" class="back-link">← Back to Dashboard</a>
+</div>
+
+{% endblock %}

@@ -1,0 +1,375 @@
+{% extends 'appointments/base.html' %}
+{% block title %}My Appointments - QueueSmart{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-header {
+        margin-bottom: 40px;
+        padding-bottom: 30px;
+        border-bottom: 2px solid #e0e0e0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .dashboard-header h1 {
+        color: #333;
+        font-size: 32px;
+        margin: 0;
+    }
+
+    .btn-book {
+        padding: 14px 28px;
+        background: linear-gradient(135deg, #fd7e14 0%, #ff6b6b 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(253, 126, 20, 0.3);
+        display: inline-block;
+    }
+
+    .btn-book:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(253, 126, 20, 0.4);
+    }
+
+    .btn-analytics {
+        padding: 14px 28px;
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3);
+        display: inline-block;
+    }
+
+    .btn-analytics:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(23, 162, 184, 0.4);
+    }
+
+    .appointments-section {
+        background: white;
+        padding: 35px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-title {
+        color: #333;
+        font-size: 24px;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #fd7e14;
+    }
+
+    .appointments-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 25px;
+    }
+
+    .appointment-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 25px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .appointment-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #fd7e14 0%, #ff6b6b 100%);
+    }
+
+    .appointment-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        border-color: #fd7e14;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 15px;
+    }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #333;
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-pending {
+        background: #ffc107;
+        color: #000;
+    }
+
+    .status-approved {
+        background: #28a745;
+        color: white;
+    }
+
+    .status-serving {
+        background: #0dcaf0;
+        color: white;
+        animation: pulse 2s infinite;
+    }
+
+    .status-rejected {
+        background: #dc3545;
+        color: white;
+    }
+
+    .status-completed {
+        background: #6c757d;
+        color: white;
+    }
+
+    .card-details {
+        margin-bottom: 20px;
+        padding: 0;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #e0e0e0;
+        font-size: 14px;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        color: #666;
+        font-weight: 600;
+    }
+
+    .detail-value {
+        color: #333;
+        font-weight: 500;
+    }
+
+    .queue-section {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #e0e0e0;
+        text-align: center;
+    }
+
+    .queue-number {
+        font-size: 28px;
+        font-weight: 700;
+        color: #fd7e14;
+        margin-bottom: 5px;
+    }
+
+    .queue-label {
+        color: #999;
+        font-size: 12px;
+    }
+
+    .waiting-approval {
+        color: #999;
+        font-size: 14px;
+        text-align: center;
+        padding: 15px 0;
+        margin-top: 15px;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .action-links {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .action-links a {
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        border: none;
+        display: inline-block;
+    }
+
+    .edit-link {
+        background: #0dcaf0;
+        color: white;
+    }
+
+    .edit-link:hover {
+        background: #0bb5d4;
+    }
+
+    .cancel-link {
+        background: #dc3545;
+        color: white;
+    }
+
+    .cancel-link:hover {
+        background: #c82333;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 30px;
+    }
+
+    .empty-state h3 {
+        color: #999;
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+
+    .empty-state p {
+        color: #aaa;
+        font-size: 16px;
+        margin-bottom: 30px;
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            box-shadow: 0 0 0 0 rgba(13, 202, 240, 0.7);
+        }
+        50% {
+            box-shadow: 0 0 0 10px rgba(13, 202, 240, 0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .btn-book, .btn-analytics {
+            width: 100%;
+            text-align: center;
+        }
+
+        .appointments-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .action-links {
+            flex-direction: column;
+        }
+
+        .action-links a {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <h1>My Appointments</h1>
+    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+        <a href="{% url 'client_book' %}" class="btn-book">+ Book New Appointment</a>
+        <a href="{% url 'client_analytics' %}" class="btn-analytics">📊 My Analytics</a>
+    </div>
+</div>
+
+<!-- Appointments Section -->
+<div class="appointments-section">
+    <h2 class="section-title">Your Bookings</h2>
+
+    {% if appointments %}
+        <div class="appointments-grid">
+            {% for appointment in appointments %}
+                <div class="appointment-card">
+                    <div class="card-header">
+                        <div class="card-title">{{ appointment.service.name }}</div>
+                        <span class="status-badge status-{{ appointment.status|lower }}">
+                            {% if appointment.status == 'serving' %}
+                                NOW SERVING
+                            {% else %}
+                                {{ appointment.status|upper }}
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Date</span>
+                            <span class="detail-value">{{ appointment.appointment_date|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Time</span>
+                            <span class="detail-value">{{ appointment.appointment_time|time:"H:i" }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Booked On</span>
+                            <span class="detail-value">{{ appointment.created_at|date:"M d" }}</span>
+                        </div>
+                    </div>
+
+                    {% if appointment.queue_number %}
+                        <div class="queue-section">
+                            <div class="queue-number">#{{ appointment.queue_number }}</div>
+                            <div class="queue-label">Your Position in Queue</div>
+                        </div>
+                    {% else %}
+                        <div class="waiting-approval">Waiting for approval</div>
+                    {% endif %}
+
+                    <!-- CANCEL BUTTON HERE -->
+                    {% if appointment.status in 'pending,rejected' %}
+                        <div class="action-links">
+                            <a href="{% url 'edit_appointment' appointment.id %}" class="edit-link">✏️ Edit</a>
+                            <a href="{% url 'cancel_appointment' appointment.id %}" onclick="return confirm('Cancel this appointment?')" class="cancel-link">✕ Cancel</a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>No appointments yet</h3>
+            <p>Book your first appointment to get started</p>
+            <a href="{% url 'client_book' %}" class="btn-book">Book Appointment Now</a>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}
