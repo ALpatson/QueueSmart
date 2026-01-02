@@ -1,0 +1,460 @@
+{% extends 'appointments/base.html' %}
+{% block title %}Manage Availability - QueueSmart{% endblock %}
+{% block content %}
+<style>
+    .calendar-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .calendar-header {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .month-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        background: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+    }
+    .month-nav h2 {
+        margin: 0;
+        color: #333;
+    }
+    .nav-buttons {
+        display: flex;
+        gap: 10px;
+    }
+    .nav-buttons a {
+        padding: 10px 15px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 14px;
+    }
+    .nav-buttons a:hover {
+        background: #0056b3;
+    }
+
+    /* Weekday headers */
+    .weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    .day-header {
+        font-weight: bold;
+        text-align: center;
+        padding: 10px;
+        background: #f0f0f0;
+        border-radius: 4px;
+    }
+
+    /* Calendar grid */
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .day-cell {
+        background: white;
+        border-radius: 8px;
+        padding: 15px;
+        min-height: 200px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-left: 4px solid #ddd;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .day-cell.available {
+        border-left-color: #28a745;
+        background: #f0fff4;
+    }
+    .day-cell.occupied {
+        border-left-color: #dc3545;
+        background: #fff5f5;
+    }
+    .day-cell.not-set {
+        border-left-color: #999;
+        background: #f9f9f9;
+    }
+    .day-cell.mixed {
+        border-left-color: #ffc107;
+        background: #fffef0;
+    }
+    
+    .day-cell.empty {
+        background: transparent;
+        box-shadow: none;
+        border: none;
+    }
+
+    .day-number {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        width: fit-content;
+    }
+    .status-badge.available {
+        background: #28a745;
+        color: white;
+    }
+    .status-badge.occupied {
+        background: #dc3545;
+        color: white;
+    }
+    .status-badge.not-set {
+        background: #999;
+        color: white;
+    }
+    .status-badge.mixed {
+        background: #ffc107;
+        color: black;
+    }
+
+    .time-slots {
+        font-size: 13px;
+        margin-bottom: 10px;
+        flex-grow: 1;
+        overflow-y: auto;
+    }
+    
+    .time-slot {
+        background: white;
+        padding: 8px;
+        margin: 5px 0;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .slot-time {
+        font-weight: bold;
+        color: #333;
+        font-size: 12px;
+        flex-grow: 1;
+    }
+
+    .slot-status {
+        font-size: 11px;
+        padding: 2px 4px;
+        border-radius: 3px;
+        white-space: nowrap;
+    }
+    .slot-status.avail {
+        background: #28a745;
+        color: white;
+    }
+    .slot-status.occupied {
+        background: #dc3545;
+        color: white;
+    }
+
+    .slot-actions {
+        display: flex;
+        gap: 3px;
+    }
+
+    .slot-actions form, .slot-actions a {
+        margin: 0;
+    }
+
+    .toggle-btn, .delete-btn {
+        padding: 4px 6px;
+        font-size: 11px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .toggle-btn {
+        background: #ffc107;
+        color: black;
+    }
+    .toggle-btn:hover {
+        background: #e0a800;
+    }
+
+    .delete-btn {
+        background: #dc3545;
+        color: white;
+    }
+    .delete-btn:hover {
+        background: #c82333;
+    }
+
+    .add-slot-btn {
+        background: #28a745;
+        color: white;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        width: 100%;
+        margin-top: 10px;
+    }
+    .add-slot-btn:hover {
+        background: #218838;
+    }
+
+    /* Modal */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+    }
+    .modal.show {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background-color: white;
+        padding: 25px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .close:hover {
+        color: black;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #333;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    .form-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 14px;
+    }
+    .form-group input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0,123,255,0.5);
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .checkbox-group input[type="checkbox"] {
+        width: auto;
+    }
+
+    .modal-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    .modal-buttons button {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+    }
+    .btn-save {
+        background: #28a745;
+        color: white;
+    }
+    .btn-save:hover {
+        background: #218838;
+    }
+    .btn-cancel {
+        background: #999;
+        color: white;
+    }
+    .btn-cancel:hover {
+        background: #777;
+    }
+</style>
+
+<div class="calendar-container">
+    <div class="calendar-header">
+        <h1>📅 Manage Your Availability</h1>
+        <p>Mark your available dates and time slots. Clients can only book on dates and times you mark as available.</p>
+    </div>
+
+    <div class="month-nav">
+        <h2>{{ month_name }} {{ year }}</h2>
+        <div class="nav-buttons">
+            <a href="?month={{ prev_month }}&year={{ prev_year }}">← Previous</a>
+            <a href="?month={{ next_month }}&year={{ next_year }}">Next →</a>
+        </div>
+    </div>
+
+    <!-- Weekday headers -->
+    <div class="weekdays">
+        <div class="day-header">Sun</div>
+        <div class="day-header">Mon</div>
+        <div class="day-header">Tue</div>
+        <div class="day-header">Wed</div>
+        <div class="day-header">Thu</div>
+        <div class="day-header">Fri</div>
+        <div class="day-header">Sat</div>
+    </div>
+
+    <!-- Calendar grid -->
+    <div class="calendar-grid">
+        {% for week in calendar_days %}
+            {% for day in week %}
+                {% if day.day == 0 %}
+                    <div class="day-cell empty"></div>
+                {% else %}
+                    <div class="day-cell {{ day.status }}">
+                        <div class="day-number">{{ day.day }}</div>
+                        
+                        {% if day.time_slots %}
+                            {% if day.status == 'available' %}
+                                <div class="status-badge available">✓ Available</div>
+                            {% elif day.status == 'occupied' %}
+                                <div class="status-badge occupied">✗ Occupied</div>
+                            {% elif day.status == 'mixed' %}
+                                <div class="status-badge mixed">⚡ Mixed</div>
+                            {% endif %}
+
+                            <div class="time-slots">
+                                {% for slot in day.time_slots %}
+                                    <div class="time-slot">
+                                        <span class="slot-time">{{ slot.start }} - {{ slot.end }}</span>
+                                        <span class="slot-status {% if slot.is_available %}avail{% else %}occupied{% endif %}">
+                                            {% if slot.is_available %}✓{% else %}✗{% endif %}
+                                        </span>
+                                        <div class="slot-actions">
+                                            <form method="POST" action="/staff/toggle-availability/{{ slot.id }}/" style="display: inline; margin: 0;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="toggle-btn" style="padding: 3px 5px; font-size: 10px;">
+                                                    {% if slot.is_available %}Block{% else %}Open{% endif %}
+                                                </button>
+                                            </form>
+                                            <a href="/staff/delete-availability/{{ slot.id }}/" class="delete-btn" onclick="return confirm('Delete this slot?')" style="padding: 3px 5px; font-size: 10px;">Del</a>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="status-badge not-set">Not Set</div>
+                            <p style="color: #999; font-size: 12px; margin: 10px 0;">No time slots</p>
+                        {% endif %}
+
+                        <button class="add-slot-btn" onclick="openModal('{{ day.date_str }}', '{{ month_name }}', {{ day.day }})">+ Add Slot</button>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal for adding time slot -->
+<div id="timeModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2 id="modalTitle">Add Time Slot</h2>
+        <form method="POST" id="timeForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Date</label>
+                <input type="text" id="modalDate" readonly style="background: #f0f0f0; cursor: not-allowed;">
+            </div>
+            <div class="form-group">
+                <label>Start Time</label>
+                <input type="time" name="start_time" required>
+            </div>
+            <div class="form-group">
+                <label>End Time</label>
+                <input type="time" name="end_time" required>
+            </div>
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="isAvailable" name="is_available" checked>
+                <label for="isAvailable" style="margin-bottom: 0;">Mark as Available (uncheck to mark as Occupied)</label>
+            </div>
+            <input type="hidden" name="year" value="{{ year }}">
+            <input type="hidden" name="month" value="{{ month }}">
+            <div class="modal-buttons">
+                <button type="submit" class="btn-save">Save Time Slot</button>
+                <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openModal(dateStr, monthName, dayNum) {
+        document.getElementById('modalTitle').textContent = 'Add Time Slot for ' + monthName + ' ' + dayNum;
+        document.getElementById('modalDate').value = dateStr;
+        document.getElementById('timeForm').action = '/staff/add-availability/' + dateStr + '/';
+        document.getElementById('timeModal').classList.add('show');
+        document.getElementById('timeModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('timeModal').classList.remove('show');
+        document.getElementById('timeModal').style.display = 'none';
+        document.getElementById('timeForm').reset();
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('timeModal');
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+</script>
+
+{% endblock %}

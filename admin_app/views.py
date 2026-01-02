@@ -37,7 +37,7 @@ def admin_register(request):
         admin_key = request.POST.get('admin_key')
         
         # ✅ SIMPLE: Just check a master key
-        if admin_key != os.getenv('ADMIN_KEY'):  
+        if admin_key != 'QueueSmart2026':  
             messages.error(request, "❌ Invalid admin key!")
             return redirect('admin_register')
         
