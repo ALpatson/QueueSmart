@@ -20,7 +20,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-@84p0u2z7)49o=dj(3ms=xe331)$c41@c3@pwpa-d4s78^eppu'
+
+
+SECRET_KEY = 'django-insecure-o9_1_sd!i=iwjaw1@*db6$md$9g9807n!imnnmc=8d&3ow9hw^'
 import os
 from decouple import config
 
@@ -123,12 +125,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = []
 # Email Configuration - SendGrid
 # EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
 
 # DEFAULT_FROM_EMAIL = 'noreply@queuesmart.com'
-
+MEDIA_URL = '/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
