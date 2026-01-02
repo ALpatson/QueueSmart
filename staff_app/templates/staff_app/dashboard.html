@@ -26,8 +26,15 @@
         margin: 5px 0 0 0;
     }
 
+    .header-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        align-items: center;
+    }
+
     .manage-btn {
-        background: #17a2b8;
         color: white;
         padding: 12px 24px;
         border: none;
@@ -35,9 +42,36 @@
         text-decoration: none;
         font-weight: bold;
         cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-block;
     }
 
     .manage-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .manage-btn-primary {
+        background: #17a2b8;
+    }
+
+    .manage-btn-primary:hover {
+        background: #138496;
+    }
+
+    .manage-btn-warning {
+        background: #dc3545;
+    }
+
+    .manage-btn-warning:hover {
+        background: #c82333;
+    }
+
+    .manage-btn-info {
+        background: #17a2b8;
+    }
+
+    .manage-btn-info:hover {
         background: #138496;
     }
 
@@ -235,17 +269,18 @@
     }
 </style>
 
-<div class="dashboard-header">
-    <div>
-        <h1>👤 Staff Dashboard</h1>
-        <p>Manage appointments and serve customers</p>
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <div>
+            <h1>👤 Staff Dashboard</h1>
+            <p>Manage appointments and serve customers</p>
+        </div>
+        <div class="header-buttons">
+            <a href="{% url 'staff_availability' %}" class="manage-btn manage-btn-primary">📅 Manage My Availability</a>
+            <a href="{% url 'staff_analytics' %}" class="manage-btn manage-btn-info">📊 Analytics</a>
+            <a href="{% url 'staff_change_password' %}" class="manage-btn manage-btn-warning">🔐 Change Password</a>
+        </div>
     </div>
-    <div style="display: flex; gap: 10px;">
-        <a href="{% url 'staff_availability' %}" class="manage-btn">📅 Manage My Availability</a>
-        <a href="{% url 'staff_analytics' %}" class="manage-btn" style="background: #17a2b8;">📊 Analytics</a>
-        
-    </div>
-</div>
 
     <!-- NOW SERVING SECTION -->
     {% if serving %}

@@ -14,4 +14,5 @@ urlpatterns = [
     path('serving/<int:id>/', views.mark_serving, name='staff_serving'),
     path('complete/<int:id>/', views.complete_appointment, name='staff_complete'),
     path('logout/', views.logout, name='staff_logout'),
+    path('change-password/', views.change_password, name='staff_change_password'),
 ]

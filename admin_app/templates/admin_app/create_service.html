@@ -1,0 +1,165 @@
+{% extends 'appointments/base.html' %}
+{% block title %}Create Service - QueueSmart{% endblock %}
+{% block content %}
+
+<style>
+    .create-service-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .create-service-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .create-service-header h1 {
+        color: #333;
+        margin: 0 0 10px 0;
+        font-size: 28px;
+    }
+
+    .create-service-header p {
+        color: #666;
+        margin: 0;
+        font-size: 14px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    label {
+        display: block;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+        font-family: Arial, sans-serif;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .alert {
+        padding: 12px 15px;
+        background: #d1ecf1;
+        border: 1px solid #bee5eb;
+        color: #0c5460;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+
+    .btn-primary {
+        background: #28a745;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #218838;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #5a6268;
+    }
+
+    .help-text {
+        font-size: 12px;
+        color: #666;
+        margin-top: 5px;
+    }
+</style>
+
+<div class="create-service-container">
+    <div class="create-service-header">
+        <h1>🎯 Create New Service</h1>
+        <p>Add a new service that your staff can provide</p>
+    </div>
+
+    <div class="alert">
+        <strong>ℹ️ Info:</strong> Services are the different types of appointments your business offers (e.g., Haircut, Consultation, etc.). Staff can be assigned to provide these services.
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- Service Name -->
+        <div class="form-group">
+            <label for="name">Service Name *</label>
+            <input type="text" id="name" name="name" placeholder="e.g., Haircut, Consultation, etc." required>
+            <div class="help-text">The name of the service offered</div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+            <label for="description">Description *</label>
+            <textarea id="description" name="description" placeholder="Describe what this service includes..." required></textarea>
+            <div class="help-text">A detailed description of the service</div>
+        </div>
+
+        <!-- Duration -->
+        <div class="form-group">
+            <label for="duration">Duration (in minutes) *</label>
+            <input type="number" id="duration" name="duration" placeholder="45" min="1" required>
+            <div class="help-text">How long the service typically takes (e.g., 45 minutes)</div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="button-group">
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">← Back</a>
+            <button type="submit" class="btn btn-primary">✓ Create Service</button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

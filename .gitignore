@@ -32,6 +32,7 @@ MANIFEST
 venv/
 ENV/
 env/
+.venv/
 
 # IDE
 .vscode/
@@ -39,18 +40,31 @@ env/
 *.swp
 *.swo
 *~
+*.sublime-project
+*.sublime-workspace
 
 # Database
 db.sqlite3
 *.sqlite3
+*.db
 
 # OS
 .DS_Store
 Thumbs.db
+*.lnk
 
 # Django
 *.log
 local_settings.py
+/media/
+/static/
+/staticfiles/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
 
 # Secrets and credentials
 **/secrets/
@@ -58,3 +72,8 @@ local_settings.py
 *.pem
 *.key
 *.pub
+
+# Misc
+.env.backup
+*.backup
+dump.rdb

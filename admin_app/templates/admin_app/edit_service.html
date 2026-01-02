@@ -1,0 +1,233 @@
+{% extends 'appointments/base.html' %}
+{% block title %}Edit Service - QueueSmart{% endblock %}
+{% block content %}
+
+<style>
+    .container {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .form-container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .form-container h1 {
+        color: #333;
+        margin-bottom: 30px;
+        font-size: 28px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        color: #333;
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        font-family: inherit;
+        box-sizing: border-box;
+        transition: border-color 0.3s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .checkbox-group {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 6px;
+    }
+
+    .checkbox-item {
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        margin-right: 10px;
+        cursor: pointer;
+        accent-color: #667eea;
+    }
+
+    .checkbox-item label {
+        margin: 0;
+        cursor: pointer;
+        font-weight: 400;
+    }
+
+    .form-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background: #667eea;
+        color: white;
+        flex: 1;
+    }
+
+    .btn-primary:hover {
+        background: #5568d3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .btn-secondary {
+        background: #e0e0e0;
+        color: #333;
+        flex: 1;
+    }
+
+    .btn-secondary:hover {
+        background: #d0d0d0;
+    }
+
+    .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        border-left: 4px solid #dc3545;
+    }
+
+    .success-message {
+        background: #d4edda;
+        color: #155724;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        border-left: 4px solid #28a745;
+    }
+</style>
+
+<div class="container">
+    <div class="form-container">
+        <h1>✏️ Edit Service</h1>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="{% if message.tags %}{{ message.tags }}{% endif %}-message">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="name">Service Name *</label>
+                <input 
+                    type="text" 
+                    id="name" 
+                    name="name" 
+                    value="{{ service.name }}"
+                    placeholder="e.g., Hair Cut, Hair Wash"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description *</label>
+                <textarea 
+                    id="description" 
+                    name="description" 
+                    placeholder="Describe this service..."
+                    required
+                >{{ service.description }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="duration">Duration (minutes) *</label>
+                <input 
+                    type="number" 
+                    id="duration" 
+                    name="duration" 
+                    value="{{ service.duration }}"
+                    min="1"
+                    placeholder="e.g., 30, 60"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label>Assign Staff Members *</label>
+                <div class="checkbox-group">
+                    {% if all_staff %}
+                        {% for staff in all_staff %}
+                            <div class="checkbox-item">
+                                <input 
+                                    type="checkbox" 
+                                    id="staff_{{ staff.id }}" 
+                                    name="staff" 
+                                    value="{{ staff.id }}"
+                                    {% if staff in service.staff.all %}checked{% endif %}
+                                >
+                                <label for="staff_{{ staff.id }}">
+                                    {{ staff.first_name }} {{ staff.last_name }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="color: #999; margin: 0;">No staff members available. Create staff first.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-buttons">
+                <button type="submit" class="btn btn-primary">💾 Update Service</button>
+                <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">❌ Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

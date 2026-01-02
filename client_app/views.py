@@ -6,10 +6,17 @@ from datetime import datetime
 import json
 from django.db.models import Count
 from datetime import date
+
+from django.core.mail import send_mail
+from django.conf import settings
+import secrets
+import string
+
+# ✅ CORRECT IMPORTS FOR NOTIFICATIONS
 from notifications.views import (
     notify_appointment_booked,
-    notify_appointment_cancelled,
-    notify_appointment_edited
+    notify_staff_appointment_cancelled,
+    notify_staff_appointment_edited
 )
 
 def client_register(request):
@@ -67,6 +74,103 @@ def logout(request):
     request.session.flush()
     return redirect('client_login')
 
+def forgot_password(request):
+    """Client forgot password - send reset email"""
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        
+        try:
+            user = CustomUser.objects.get(email=email, role='client')
+            
+            # Generate a temporary password (8 characters)
+            temp_password = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(8))
+            
+            # Update user password
+            user.password = make_password(temp_password)
+            user.save()
+            
+            # Send email with new password
+            send_mail(
+                subject='QueueSmart - Password Reset',
+                message=f"""
+Hello {user.first_name},
+
+You requested a password reset for your QueueSmart account.
+
+Your temporary password is: {temp_password}
+
+Please log in with this password and change it to something more secure.
+
+If you didn't request this, please ignore this email.
+
+Best regards,
+QueueSmart Team
+                """,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+            
+            messages.success(request, f"Password reset email sent to {email}. Check your inbox!")
+            return redirect('client_login')
+        
+        except CustomUser.DoesNotExist:
+            messages.error(request, "No client account found with this email!")
+            return redirect('forgot_password')
+    
+    return render(request, 'client_app/forgot_password.html')
+
+
+def change_password(request):
+    """Client change password view"""
+    if request.method == 'POST':
+        user_id = request.session.get('user_id')
+        
+        if not user_id:
+            return redirect('client_login')
+        
+        old_password = request.POST.get('old_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        # Validate inputs
+        if not all([old_password, new_password, confirm_password]):
+            messages.error(request, 'All fields are required!')
+            return redirect('client_change_password')
+        
+        # Check if passwords match
+        if new_password != confirm_password:
+            messages.error(request, 'New passwords do not match!')
+            return redirect('client_change_password')
+        
+        # Check password length
+        if len(new_password) < 6:
+            messages.error(request, 'Password must be at least 6 characters!')
+            return redirect('client_change_password')
+        
+        try:
+            user = CustomUser.objects.get(id=user_id, role='client')
+            
+            # Verify old password
+            if not check_password(old_password, user.password):
+                messages.error(request, 'Current password is incorrect!')
+                return redirect('client_change_password')
+            
+            # Update password
+            user.password = make_password(new_password)
+            user.save()
+            
+            messages.success(request, 'Password changed successfully! Please log in again.')
+            return redirect('client_login')
+        
+        except CustomUser.DoesNotExist:
+            messages.error(request, 'User not found!')
+            return redirect('client_login')
+    
+    context = {}
+    return render(request, 'client_app/change_password.html', context)
+
+
 def get_user_context(user_id):
     """Get user context for all views"""
     try:
@@ -80,6 +184,42 @@ def get_user_context(user_id):
             'user_first_name': 'User',
             'user_last_name': '',
         }
+
+def get_notification_title(notification_type):
+    """Get human-readable title for notification type"""
+    titles = {
+        'confirmation': 'Booking Confirmed',
+        'approval': 'Appointment Approved',
+        'rejection': 'Appointment Rejected',
+        'reminder': 'Appointment Reminder',
+        'cancellation': 'Appointment Cancelled',
+        'edited': 'Appointment Modified',
+        'booking': 'New Booking',
+    }
+    return titles.get(notification_type.lower(), 'Notification')
+
+def format_notification_time(sent_at):
+    """Format notification time in readable format"""
+    if not sent_at:
+        return 'Just now'
+    
+    from django.utils import timezone
+    now = timezone.now()
+    diff = now - sent_at
+    
+    seconds = int(diff.total_seconds())
+    
+    if seconds < 60:
+        return 'Just now'
+    elif seconds < 3600:
+        minutes = seconds // 60
+        return f'{minutes}m ago'
+    elif seconds < 86400:
+        hours = seconds // 3600
+        return f'{hours}h ago'
+    else:
+        days = seconds // 86400
+        return f'{days}d ago'
 
 def client_dashboard(request):
     if request.session.get('user_role') != 'client':
@@ -112,41 +252,6 @@ def client_dashboard(request):
     context.update(get_user_context(user_id))
     
     return render(request, 'client_app/dashboard.html', context)
-
-def get_notification_title(notification_type):
-    """Get human-readable title for notification type"""
-    titles = {
-        'confirmation': 'Booking Confirmed',
-        'approval': 'Appointment Approved',
-        'rejection': 'Appointment Rejected',
-        'reminder': 'Appointment Reminder',
-        'cancellation': 'Appointment Cancelled',
-        'edited': 'Appointment Modified',
-    }
-    return titles.get(notification_type.lower(), 'Notification')
-
-def format_notification_time(sent_at):
-    """Format notification time in readable format"""
-    if not sent_at:
-        return 'Just now'
-    
-    from django.utils import timezone
-    now = timezone.now()
-    diff = now - sent_at
-    
-    seconds = int(diff.total_seconds())
-    
-    if seconds < 60:
-        return 'Just now'
-    elif seconds < 3600:
-        minutes = seconds // 60
-        return f'{minutes}m ago'
-    elif seconds < 86400:
-        hours = seconds // 3600
-        return f'{hours}h ago'
-    else:
-        days = seconds // 86400
-        return f'{days}d ago'
 
 def book_appointment(request):
     """Book appointment - show available dates and time slots"""
@@ -200,11 +305,13 @@ def book_appointment(request):
             appointment = Appointment.objects.create(
                 client_id=user_id,
                 service=service,
+                staff=staff,  # ✅ CORRECT - Now that staff field exists
                 appointment_date=appointment_date,
                 appointment_time=appointment_time,
                 status='pending'
             )
 
+            # ✅ NOTIFY CLIENT AND STAFF
             notify_appointment_booked(appointment)
 
             messages.success(request, f"Appointment booked for {appointment_date} at {appointment_time_str}! Waiting for staff approval.")
@@ -344,11 +451,12 @@ def edit_appointment(request, appointment_id):
                     messages.error(request, "This date/time is no longer available!")
                     return redirect('edit_appointment', appointment_id=appointment_id)
                 
-                # Store old details for notification
+                # ✅ STORE OLD DETAILS FOR NOTIFICATION
                 old_date = appointment.appointment_date
                 old_time = appointment.appointment_time
                 
-                # Update appointment
+                # ✅ UPDATE APPOINTMENT
+                appointment.staff = staff  # ✅ Update staff when editing
                 appointment.service = service
                 appointment.appointment_date = appointment_date
                 appointment.appointment_time = appointment_time
@@ -356,8 +464,8 @@ def edit_appointment(request, appointment_id):
                 appointment.queue_number = None
                 appointment.save()
                 
-                # Send notification to staff that appointment was edited
-                notify_appointment_edited(appointment, old_date, old_time)
+                # ✅ NOTIFY STAFF ABOUT THE CHANGE
+                notify_staff_appointment_edited(appointment, old_date, old_time)
                 
                 messages.success(request, "Appointment updated successfully! Staff has been notified of the change.")
                 return redirect('client_dashboard')
@@ -447,76 +555,57 @@ def edit_appointment(request, appointment_id):
         return redirect('client_dashboard')
 
 def cancel_appointment(request, appointment_id):
-    """Cancel an appointment"""
-    print("\n" + "="*50)
-    print("🔵 CANCEL_APPOINTMENT FUNCTION CALLED")
-    print("="*50)
-    
+    """Cancel an appointment and notify staff"""
     if request.session.get('user_role') != 'client':
-        print("❌ Not a client, redirecting to login")
         return redirect('client_login')
     
     user_id = request.session.get('user_id')
-    print(f"Client ID: {user_id}")
-    print(f"Appointment ID: {appointment_id}")
     
     try:
         appointment = Appointment.objects.get(
             id=appointment_id, 
             client_id=user_id
         )
-        print(f"✅ Found appointment: {appointment.service.name}")
         
         if appointment.status == 'completed':
-            print("❌ Appointment already completed, can't cancel")
             messages.error(request, "Cannot cancel completed appointments")
             return redirect('client_dashboard')
         
         appointment_date = appointment.appointment_date
         appointment_time = appointment.appointment_time.strftime('%H:%M')
         
+        # ✅ DEBUG: Check if staff exists
+        print(f"\n{'='*60}")
+        print(f"CANCEL APPOINTMENT - DEBUG")
+        print(f"{'='*60}")
+        print(f"Appointment ID: {appointment.id}")
+        print(f"Client: {appointment.client.first_name}")
         print(f"Service: {appointment.service.name}")
-        print(f"Date: {appointment_date}")
-        print(f"Time: {appointment_time}")
+        print(f"Staff ID: {appointment.staff_id if appointment.staff else 'NONE'}")
+        print(f"Staff: {appointment.staff}")
+        print(f"{'='*60}\n")
         
-        # Get staff members who provide this service
-        staff_members = appointment.service.staff.filter(role='staff')
-        print(f"✅ Found {staff_members.count()} staff members for this service")
-        
-        # Create notifications for each staff member
-        client_name = f"{appointment.client.first_name} {appointment.client.last_name}"
-        notification_message = f"Appointment cancelled by {client_name} for {appointment.service.name} on {appointment_date.strftime('%B %d, %Y')} at {appointment_time}. The time slot is now available."
-        
-        print(f"Creating notifications...")
-        for staff in staff_members:
-            print(f"  - Creating notification for staff: {staff.first_name} {staff.last_name}")
-            
-            notif = Notification.objects.create(
-                user=staff,
-                appointment=appointment,
-                message=notification_message,
-                notification_type='cancellation'
-            )
-            print(f"    ✅ Notification created! ID: {notif.id}")
+        # ✅ NOTIFY STAFF BEFORE DELETING
+        if appointment.staff:
+            print(f"✅ Staff exists, sending notification...")
+            notify_staff_appointment_cancelled(appointment)
+            print(f"✅ Notification sent!")
+        else:
+            print(f"❌ WARNING: Appointment has no staff assigned!")
         
         # Delete the appointment
-        print(f"Deleting appointment...")
         appointment.delete()
-        print(f"✅ Appointment deleted!")
         
         messages.success(request, f"Appointment on {appointment_date} at {appointment_time} has been cancelled. Staff has been notified.")
-        print("🟢 CANCEL_APPOINTMENT COMPLETE - SUCCESS")
         
     except Appointment.DoesNotExist:
-        print(f"❌ Appointment not found for user {user_id} with ID {appointment_id}")
         messages.error(request, "Appointment not found!")
     except Exception as e:
-        print(f"❌ ERROR: {str(e)}")
+        print(f"❌ ERROR in cancel_appointment: {str(e)}")
         import traceback
         traceback.print_exc()
         messages.error(request, f"Error: {str(e)}")
     
-    print("="*50 + "\n")
     return redirect('client_dashboard')
 
 def client_analytics_view(request):

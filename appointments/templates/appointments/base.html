@@ -399,11 +399,11 @@
             <div class="header-left">
                 <div class="logo-text">QueueSmart</div>
                 {% if request.session.user_role == 'client' %}
-                    <div class="user-greeting">Hi {{ user_first_name }}! 👋</div>
+                    <div class="user-greeting">Hi {{ user_first_name }}!</div>
                 {% elif request.session.user_role == 'staff' %}
-                    <div class="user-greeting">Hi {{ user_first_name }}! 👋</div>
+                    <div class="user-greeting">Hi {{ user_first_name }}!</div>
                 {% elif request.session.user_role == 'admin' %}
-                    <div class="user-greeting">Hi {{ user_first_name }}! 👋</div>
+                    <div class="user-greeting">Hi {{ user_first_name }}!</div>
                 {% endif %}
             </div>
             <div class="header-right">
@@ -464,7 +464,7 @@
     </div>
 
     <footer>
-        <p>&copy; 2025 QueueSmart. Smart Appointment & Queue Management System</p>
+        <p>&copy; 2026 QueueSmart. Smart Appointment & Queue Management System</p>
     </footer>
 
     <script>
@@ -483,10 +483,14 @@
         }
 
         function loadNotifications() {
+            // Load notifications from the context variable (already loaded on page load)
             const notifications = {{ notifications_json|safe }};
             const list = document.getElementById('notificationsList');
             
-            if (notifications.length === 0) {
+            console.log('Loaded notifications:', notifications);
+            console.log('Total notifications:', notifications.length);
+            
+            if (!notifications || notifications.length === 0) {
                 list.innerHTML = `
                     <div class="empty-notifications">
                         <div style="font-size: 48px; margin-bottom: 15px;">📭</div>
@@ -496,26 +500,50 @@
                 return;
             }
 
-            list.innerHTML = notifications.map(notif => `
-                <div class="notification-item ${notif.type}">
-                    <div class="notification-content">
-                        <div class="notification-type ${notif.type}">${notif.type.toUpperCase()}</div>
-                        <div style="font-weight: bold; color: #333; margin-bottom: 5px;">${notif.title}</div>
-                        <div class="notification-message">${notif.message}</div>
-                        <div class="notification-time">${notif.time}</div>
+            let html = '';
+            notifications.forEach((notif, index) => {
+                console.log(`Notification ${index}:`, notif);
+                
+                const icons = {
+                    'booking': '📌',
+                    'confirmation': '✅',
+                    'approval': '✅',
+                    'rejection': '❌',
+                    'reminder': '🔔',
+                    'cancellation': '❌',
+                    'edited': '✏️'
+                };
+
+                const icon = icons[notif.type] || '🔔';
+
+                html += `
+                    <div class="notification-item ${notif.type}">
+                        <div class="notification-content">
+                            <div class="notification-type ${notif.type}">${notif.type.toUpperCase()}</div>
+                            <div style="font-weight: bold; color: #333; margin-bottom: 5px;">${notif.title}</div>
+                            <div class="notification-message">${icon} ${notif.message}</div>
+                            <div class="notification-time">${notif.time}</div>
+                        </div>
+                        <button class="delete-btn" onclick="deleteNotification(${notif.id})">✕ Delete</button>
                     </div>
-                    <button class="delete-btn" onclick="deleteNotification(${notif.id})">✕ Delete</button>
-                </div>
-            `).join('');
+                `;
+            });
+
+            list.innerHTML = html;
+            console.log('Notifications rendered successfully');
         }
 
         function deleteNotification(id) {
-            fetch(`/notifications/delete/${id}/`, {
-                method: 'GET',
-            }).then(response => {
-                loadNotifications();
-                location.reload();
-            });
+            if (confirm('Delete this notification?')) {
+                fetch(`/notifications/delete/${id}/`, {
+                    method: 'GET',
+                }).then(response => {
+                    console.log('Notification deleted, reloading...');
+                    location.reload();
+                }).catch(err => {
+                    console.error('Error deleting notification:', err);
+                });
+            }
         }
 
         function markAllAsRead() {
@@ -531,7 +559,12 @@
                 headers: {
                     'X-CSRFToken': getCookie('csrftoken'),
                 },
-            }).catch(err => console.log('Marked as read'));
+            }).then(response => {
+                console.log('All notifications marked as read');
+                return response.json();
+            }).catch(err => {
+                console.log('Error marking as read:', err);
+            });
         }
 
         function getCookie(name) {
@@ -563,6 +596,9 @@
                 closeNotificationModal();
             }
         });
+
+        // Debug: Log notifications on page load
+        console.log('Page loaded with notifications:', {{ notifications_json|safe }});
     </script>
 </body>
 </html>

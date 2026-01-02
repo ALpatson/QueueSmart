@@ -1,9 +1,9 @@
 {% extends 'appointments/base.html' %}
-{% block title %}Create Staff Account - QueueSmart{% endblock %}
+{% block title %}Edit Staff - QueueSmart{% endblock %}
 {% block content %}
 
 <style>
-    .create-staff-container {
+    .edit-staff-container {
         max-width: 600px;
         margin: 0 auto;
         background: white;
@@ -12,18 +12,18 @@
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
 
-    .create-staff-header {
+    .edit-staff-header {
         text-align: center;
         margin-bottom: 30px;
     }
 
-    .create-staff-header h1 {
+    .edit-staff-header h1 {
         color: #333;
         margin: 0 0 10px 0;
         font-size: 28px;
     }
 
-    .create-staff-header p {
+    .edit-staff-header p {
         color: #666;
         margin: 0;
         font-size: 14px;
@@ -42,8 +42,6 @@
     }
 
     input[type="text"],
-    input[type="email"],
-    input[type="password"],
     input[type="tel"] {
         width: 100%;
         padding: 12px;
@@ -55,8 +53,6 @@
     }
 
     input[type="text"]:focus,
-    input[type="email"]:focus,
-    input[type="password"]:focus,
     input[type="tel"]:focus {
         outline: none;
         border-color: #667eea;
@@ -133,18 +129,36 @@
 
     .alert {
         padding: 12px 15px;
-        background: #fff3cd;
-        border: 1px solid #ffeaa7;
-        color: #856404;
+        background: #d1ecf1;
+        border: 1px solid #bee5eb;
+        color: #0c5460;
         border-radius: 6px;
         margin-bottom: 20px;
         font-size: 14px;
     }
 
-    .alert-info {
-        background: #d1ecf1;
-        border-color: #bee5eb;
-        color: #0c5460;
+    .staff-info {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 25px;
+        border-left: 4px solid #667eea;
+    }
+
+    .staff-info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .staff-info-label {
+        font-weight: bold;
+        color: #666;
+    }
+
+    .staff-info-value {
+        color: #333;
     }
 
     .button-group {
@@ -184,6 +198,16 @@
         background: #5a6268;
     }
 
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+        flex: 0.5;
+    }
+
+    .btn-danger:hover {
+        background: #c82333;
+    }
+
     .service-required {
         color: #dc3545;
         font-size: 12px;
@@ -195,53 +219,59 @@
     }
 </style>
 
-<div class="create-staff-container">
-    <div class="create-staff-header">
-        <h1>👤 Create Staff Account</h1>
-        <p>Add a new staff member to your team</p>
+<div class="edit-staff-container">
+    <div class="edit-staff-header">
+        <h1>✏️ Edit Staff Member</h1>
+        <p>Update staff information and assigned services</p>
     </div>
 
-    <div class="alert alert-info">
-        <strong>ℹ️ Info:</strong> Create login credentials for your staff members. Share the email and password with them.
+    <div class="alert">
+        <strong>ℹ️ Info:</strong> Update the staff member's personal information and the services they provide.
+    </div>
+
+    <!-- Current Staff Info -->
+    <div class="staff-info">
+        <div class="staff-info-row">
+            <span class="staff-info-label">📧 Email:</span>
+            <span class="staff-info-value">{{ staff.email }}</span>
+        </div>
+        <div class="staff-info-row">
+            <span class="staff-info-label">📅 Joined:</span>
+            <span class="staff-info-value">{{ staff.date_joined|date:"M d, Y" }}</span>
+        </div>
+        <div class="staff-info-row">
+            <span class="staff-info-label">📱 Current Services:</span>
+            <span class="staff-info-value">
+                {% if staff.services.all %}
+                    {% for service in staff.services.all %}
+                        <span style="background: #667eea; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; display: inline-block; margin: 2px;">{{ service.name }}</span>
+                    {% endfor %}
+                {% else %}
+                    <span style="color: #999;">None assigned</span>
+                {% endif %}
+            </span>
+        </div>
     </div>
 
     <form method="POST">
         {% csrf_token %}
 
-        <!-- Email -->
-        <div class="form-group">
-            <label for="email">Email Address *</label>
-            <input type="email" id="email" name="email" placeholder="staff@example.com" required>
-        </div>
-
         <!-- Name Row -->
         <div class="form-row">
             <div class="form-group">
                 <label for="first_name">First Name *</label>
-                <input type="text" id="first_name" name="first_name" placeholder="John" required>
+                <input type="text" id="first_name" name="first_name" value="{{ staff.first_name }}" required>
             </div>
             <div class="form-group">
                 <label for="last_name">Last Name *</label>
-                <input type="text" id="last_name" name="last_name" placeholder="Doe" required>
+                <input type="text" id="last_name" name="last_name" value="{{ staff.last_name }}" required>
             </div>
         </div>
 
         <!-- Phone -->
         <div class="form-group">
             <label for="phone">Phone Number</label>
-            <input type="tel" id="phone" name="phone" placeholder="+1 (555) 000-0000">
-        </div>
-
-        <!-- Password Row -->
-        <div class="form-row">
-            <div class="form-group">
-                <label for="password">Password *</label>
-                <input type="password" id="password" name="password" placeholder="••••••••" required>
-            </div>
-            <div class="form-group">
-                <label for="password_confirm">Confirm Password *</label>
-                <input type="password" id="password_confirm" name="password_confirm" placeholder="••••••••" required>
-            </div>
+            <input type="tel" id="phone" name="phone" value="{{ staff.phone_number|default:'' }}">
         </div>
 
         <!-- Services -->
@@ -251,7 +281,8 @@
                 {% if services %}
                     {% for service in services %}
                         <div class="service-option">
-                            <input type="checkbox" id="service_{{ service.id }}" name="services" value="{{ service.id }}">
+                            <input type="checkbox" id="service_{{ service.id }}" name="services" value="{{ service.id }}"
+                                {% if service.id|stringformat:"s" in staff_service_ids %}checked{% endif %}>
                             <label for="service_{{ service.id }}">
                                 <span class="service-name">{{ service.name }}</span>
                                 <span class="service-description">{{ service.description }}</span>
@@ -259,7 +290,7 @@
                         </div>
                     {% endfor %}
                 {% else %}
-                    <p style="color: #999; text-align: center; padding: 20px;">No services available. Create services first.</p>
+                    <p style="color: #999; text-align: center; padding: 20px;">No services available.</p>
                 {% endif %}
             </div>
             <div class="service-required">
@@ -270,7 +301,7 @@
         <!-- Buttons -->
         <div class="button-group">
             <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">← Back</a>
-            <button type="submit" class="btn btn-primary">✓ Create Staff Member</button>
+            <button type="submit" class="btn btn-primary">✓ Save Changes</button>
         </div>
     </form>
 </div>

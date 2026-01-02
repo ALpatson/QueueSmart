@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QueueSmart - Book Your Appointment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .content {
+            text-align: center;
+            color: white;
+        }
+
+        .logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 48px;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            font-size: 20px;
+            margin-bottom: 10px;
+            opacity: 0.95;
+        }
+
+        .description {
+            font-size: 16px;
+            margin-bottom: 40px;
+            opacity: 0.9;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 60px;
+        }
+
+        .btn {
+            padding: 14px 35px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-3px);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-top: 60px;
+            background: rgba(255,255,255,0.1);
+            padding: 50px 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature {
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .feature h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .feature p {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+
+
+        .admin-login-section {
+            display: none;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .admin-login-section.show {
+            display: block;
+        }
+
+        .admin-login-section p {
+            font-size: 14px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .admin-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 32px;
+            }
+
+            .subtitle {
+                font-size: 18px;
+            }
+
+            .buttons-container {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+                padding: 30px 20px;
+            }
+
+            .admin-buttons {
+                flex-direction: column;
+            }
+
+            .admin-buttons .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <div class="logo" onclick="toggleAdminLogin()" title="Click to reveal admin options">📅</div>
+            <h1>QueueSmart</h1>
+            <p class="subtitle">Book Your Appointment Online</p>
+            <p class="description">
+                Fast, easy, and convenient appointment booking. 
+                No more waiting in lines. Schedule your appointment with just a few clicks.
+            </p>
+            
+            <div class="buttons-container">
+                <a href="/client/login/" class="btn btn-primary">👤 Client Login</a>
+                <a href="/client/register/" class="btn btn-secondary">📝 Create Account</a>
+            </div>
+
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">📋</div>
+                    <h3>Book Online</h3>
+                    <p>Schedule appointments anytime, anywhere</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">⏳</div>
+                    <h3>Smart Queue</h3>
+                    <p>Know your position in queue</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔔</div>
+                    <h3>Notifications</h3>
+                    <p>Get reminders and updates via email</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Quick & Easy</h3>
+                    <p>Fast booking process in minutes</p>
+                </div>
+            </div>
+
+            <div class="footer">
+                <p>© 2026 QueueSmart. All rights reserved.</p>
+            </div>
+
+            <!-- Hidden Admin/Staff Login Section -->
+            <div class="admin-login-section" id="adminLoginSection">
+                <p>🔐 Staff & Admin Portal</p>
+                <div class="admin-buttons">
+                    <a href="/admin/login/" class="btn btn-secondary">👨‍💼 Admin Login</a>
+                    <a href="/staff/login/" class="btn btn-secondary">👔 Staff Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleAdminLogin() {
+            const adminSection = document.getElementById('adminLoginSection');
+            adminSection.classList.toggle('show');
+        }
+
+        // Close admin section when clicking outside
+        document.addEventListener('click', function(event) {
+            const adminSection = document.getElementById('adminLoginSection');
+            const logo = document.querySelector('.logo');
+            if (!event.target.closest('.logo') && adminSection.classList.contains('show')) {
+                adminSection.classList.remove('show');
+            }
+        });
+    </script>

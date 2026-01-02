@@ -59,6 +59,7 @@ QueueSmart Team
 
 def notify_appointment_booked(appointment):
     """Send notification when appointment is booked"""
+    # Notify client
     message = f"Your appointment for {appointment.service.name} on {appointment.appointment_date.strftime('%B %d, %Y')} at {appointment.appointment_time.strftime('%H:%M')} has been booked. We will notify you when it's confirmed."
     
     create_notification(
@@ -67,6 +68,10 @@ def notify_appointment_booked(appointment):
         'confirmation',
         message
     )
+    
+    # ✅ ALSO NOTIFY STAFF
+    notify_staff_new_booking(appointment)
+
 
 def notify_appointment_approved(appointment):
     """Send notification when appointment is approved"""
@@ -114,65 +119,159 @@ def notify_appointment_completed(appointment):
         message
     )
 
-def notify_appointment_cancelled(appointment):
-    """Send notification to staff when client cancels appointment"""
+# ============================================
+# ✅ STAFF NOTIFICATION FUNCTIONS
+# ============================================
+
+def notify_staff_new_booking(appointment):
+    """Notify staff when a client books an appointment"""
     try:
-        # Get all staff members who provide this service
-        staff_members = appointment.service.staff.filter(role='staff')
+        # Get the staff member assigned to this appointment
+        staff = CustomUser.objects.get(id=appointment.staff_id)
         
         client_name = f"{appointment.client.first_name} {appointment.client.last_name}"
-        message = f"Appointment cancelled by {client_name} for {appointment.service.name} on {appointment.appointment_date.strftime('%B %d, %Y')} at {appointment.appointment_time.strftime('%H:%M')}. The time slot is now available."
+        message = f"📌 New booking from {client_name} for {appointment.service.name} on {appointment.appointment_date.strftime('%B %d, %Y')} at {appointment.appointment_time.strftime('%H:%M')}"
         
-        # Send notification to all staff providing this service
-        for staff in staff_members:
-            Notification.objects.create(
-                user=staff,
-                appointment=appointment,
-                message=message,
-                notification_type='cancellation'
-            )
+        # Create in-app notification for staff
+        Notification.objects.create(
+            user=staff,
+            appointment=appointment,
+            message=message,
+            notification_type='booking'
+        )
+        
+        # Send email to staff
+        try:
+            email_message = f"""
+Hello {staff.first_name},
+
+You have a new appointment booking!
+
+Client: {client_name}
+Service: {appointment.service.name}
+Date: {appointment.appointment_date.strftime('%B %d, %Y')}
+Time: {appointment.appointment_time.strftime('%H:%M')}
+Status: Pending Approval
+
+Please log in to your dashboard to approve or reject this booking.
+
+Best regards,
+QueueSmart Team
+            """
             
-            # Also try to send email
-            try:
-                send_email_notification(
-                    staff.email,
-                    f"QueueSmart - Appointment Cancelled",
-                    f"Hello {staff.first_name},\n\n{message}\n\nBest regards,\nQueueSmart Team"
-                )
-            except:
-                pass
+            send_email_notification(
+                staff.email,
+                f'QueueSmart - New Appointment Booking',
+                email_message
+            )
+        except Exception as e:
+            print(f"Error sending email to staff: {e}")
+    except CustomUser.DoesNotExist:
+        print(f"Staff with id {appointment.staff_id} not found")
+    except Exception as e:
+        print(f"Error notifying staff of new booking: {str(e)}")
+
+
+def notify_staff_appointment_cancelled(appointment):
+    """Notify staff when a client cancels an appointment"""
+    try:
+        # Get the staff member assigned to this appointment
+        staff = CustomUser.objects.get(id=appointment.staff_id)
+        
+        client_name = f"{appointment.client.first_name} {appointment.client.last_name}"
+        message = f"❌ Appointment cancelled: {client_name} cancelled their booking for {appointment.service.name} on {appointment.appointment_date.strftime('%B %d, %Y')} at {appointment.appointment_time.strftime('%H:%M')}. Time slot is now available."
+        
+        # Create in-app notification for staff
+        Notification.objects.create(
+            user=staff,
+            appointment=appointment,
+            message=message,
+            notification_type='cancellation'
+        )
+        
+        # Send email to staff
+        try:
+            email_message = f"""
+Hello {staff.first_name},
+
+An appointment has been cancelled.
+
+Client: {client_name}
+Service: {appointment.service.name}
+Date: {appointment.appointment_date.strftime('%B %d, %Y')}
+Time: {appointment.appointment_time.strftime('%H:%M')}
+
+Your time slot is now available again.
+
+Best regards,
+QueueSmart Team
+            """
+            
+            send_email_notification(
+                staff.email,
+                f'QueueSmart - Appointment Cancelled',
+                email_message
+            )
+        except Exception as e:
+            print(f"Error sending email to staff: {e}")
+    except CustomUser.DoesNotExist:
+        print(f"Staff with id {appointment.staff_id} not found")
     except Exception as e:
         print(f"Error notifying staff of cancellation: {str(e)}")
 
-def notify_appointment_edited(appointment, old_date, old_time):
-    """Send notification to staff when client edits appointment"""
+
+def notify_staff_appointment_edited(appointment, old_date, old_time):
+    """Notify staff when a client edits their appointment"""
     try:
-        # Get all staff members who provide this service
-        staff_members = appointment.service.staff.filter(role='staff')
+        # Get the staff member assigned to this appointment
+        staff = CustomUser.objects.get(id=appointment.staff_id)
         
         client_name = f"{appointment.client.first_name} {appointment.client.last_name}"
-        message = f"{client_name} changed their {appointment.service.name} appointment from {old_date.strftime('%B %d, %Y')} at {old_time.strftime('%H:%M')} to {appointment.appointment_date.strftime('%B %d, %Y')} at {appointment.appointment_time.strftime('%H:%M')}."
+        message = f"✏️ Appointment modified: {client_name} changed their {appointment.service.name} appointment from {old_date.strftime('%B %d, %Y')} at {old_time.strftime('%H:%M')} to {appointment.appointment_date.strftime('%B %d, %Y')} at {appointment.appointment_time.strftime('%H:%M')}"
         
-        # Send notification to all staff providing this service
-        for staff in staff_members:
-            Notification.objects.create(
-                user=staff,
-                appointment=appointment,
-                message=message,
-                notification_type='edited'
-            )
+        # Create in-app notification for staff
+        Notification.objects.create(
+            user=staff,
+            appointment=appointment,
+            message=message,
+            notification_type='edited'
+        )
+        
+        # Send email to staff
+        try:
+            email_message = f"""
+Hello {staff.first_name},
+
+An appointment has been modified.
+
+Client: {client_name}
+Service: {appointment.service.name}
+Old Time: {old_date.strftime('%B %d, %Y')} at {old_time.strftime('%H:%M')}
+New Time: {appointment.appointment_date.strftime('%B %d, %Y')} at {appointment.appointment_time.strftime('%H:%M')}
+
+Please update your schedule accordingly.
+
+Best regards,
+QueueSmart Team
+            """
             
-            # Also try to send email
-            try:
-                send_email_notification(
-                    staff.email,
-                    f"QueueSmart - Appointment Modified",
-                    f"Hello {staff.first_name},\n\n{message}\n\nBest regards,\nQueueSmart Team"
-                )
-            except:
-                pass
+            send_email_notification(
+                staff.email,
+                f'QueueSmart - Appointment Modified',
+                email_message
+            )
+        except Exception as e:
+            print(f"Error sending email to staff: {e}")
+    except CustomUser.DoesNotExist:
+        print(f"Staff with id {appointment.staff_id} not found")
     except Exception as e:
         print(f"Error notifying staff of edit: {str(e)}")
+
+
+def get_staff_unread_notifications(user_id):
+    """Get count of unread notifications for staff"""
+    return Notification.objects.filter(user_id=user_id, is_read=False).count()
+
 
 def view_notifications(request):
     """View all notifications for logged in user"""

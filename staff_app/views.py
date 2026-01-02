@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import check_password, make_password
 from appointments.models import CustomUser, Appointment, StaffAvailability, Service, Notification
 from datetime import datetime, timedelta
 import datetime as dt
@@ -90,82 +90,158 @@ def format_notification_time(sent_at):
         return f'{days}d ago'
 
 def staff_dashboard(request):
-    """Staff sees only appointments for services they provide"""
+    """Staff dashboard"""
     if request.session.get('user_role') != 'staff':
         return redirect('staff_login')
     
     staff_id = request.session.get('user_id')
     
-    # Get staff member's name
     try:
-        staff_user = CustomUser.objects.get(id=staff_id)
-        staff_name = f"{staff_user.first_name} {staff_user.last_name}"
+        staff = CustomUser.objects.get(id=staff_id, role='staff')
     except CustomUser.DoesNotExist:
-        staff_name = "Staff Member"
+        return redirect('staff_login')
     
-    # Get all services this staff member provides
-    services = Service.objects.filter(staff__id=staff_id)
+    # Get services for this staff
+    services = staff.services.all()
     
-    # Get appointments only for these services
+    # Get pending appointments
     pending = Appointment.objects.filter(
-        service__in=services,
-        status='pending'
-    )
+        status='pending',
+        service__in=services
+    ).select_related('client', 'service', 'staff').order_by('-created_at')
+    
+    # Get approved queue
     approved = Appointment.objects.filter(
-        service__in=services,
-        status='approved'
-    ).order_by('queue_number')
+        status='approved',
+        staff=staff
+    ).select_related('client', 'service', 'staff').order_by('queue_number')
+    
+    # Get serving
     serving = Appointment.objects.filter(
-        service__in=services,
-        status='serving'
+        status='serving',
+        staff=staff
     ).first()
     
-    # Get all notifications for staff
-    all_notifications = Notification.objects.filter(user_id=staff_id).order_by('-sent_at')
-    unread_count = Notification.objects.filter(user_id=staff_id, is_read=False).count()
+    # Get unread count
+    unread_count = Notification.objects.filter(
+        user_id=staff_id,
+        is_read=False
+    ).count()
     
-    # Format notifications for JavaScript
+    # Get notifications
+    all_notifications = Notification.objects.filter(
+        user_id=staff_id
+    ).order_by('-sent_at')
+    
     notifications_list = []
-    for notif in all_notifications[:20]:
+    for notif in all_notifications:
         notifications_list.append({
             'id': notif.id,
-            'type': notif.notification_type.lower(),
-            'title': get_notification_title(notif.notification_type),
+            'type': notif.notification_type,
+            'title': f"{notif.notification_type.upper()}",
             'message': notif.message,
-            'time': format_notification_time(notif.sent_at),
+            'time': notif.sent_at.strftime('%b %d, %Y at %I:%M %p'),
         })
     
+    import json
     notifications_json = json.dumps(notifications_list)
     
     context = {
-        'staff_name': staff_name,
+        'staff_name': f"{staff.first_name} {staff.last_name}",
         'pending': pending,
         'approved': approved,
         'serving': serving,
         'unread_count': unread_count,
         'notifications_json': notifications_json,
+        'user_first_name': staff.first_name,  # ✅ ADD THIS
     }
-    
-    context.update(get_user_context(staff_id))
     
     return render(request, 'staff_app/dashboard.html', context)
 
-def approve_appointment(request, id):
+def change_password(request):
+    """Staff member change their password"""
     if request.session.get('user_role') != 'staff':
         return redirect('staff_login')
     
+    staff_id = request.session.get('user_id')
+    staff = CustomUser.objects.get(id=staff_id)
+    
+    if request.method == 'POST':
+        old_password = request.POST.get('old_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        # Validate old password
+        if not check_password(old_password, staff.password):
+            messages.error(request, "❌ Current password is incorrect!")
+            return redirect('staff_change_password')
+        
+        # Check if new passwords match
+        if new_password != confirm_password:
+            messages.error(request, "❌ New passwords don't match!")
+            return redirect('staff_change_password')
+        
+        # Check password length
+        if len(new_password) < 6:
+            messages.error(request, "❌ New password must be at least 6 characters!")
+            return redirect('staff_change_password')
+        
+        # Update password
+        staff.password = make_password(new_password)
+        staff.save()
+        
+        messages.success(request, "✅ Password changed successfully! Please log in again.")
+        return redirect('staff_login')
+    
+    context = {}
+    context.update(get_user_context(staff_id))
+    
+    return render(request, 'staff_app/change_password.html', context)
+
+def approve_appointment(request, id):
+    """Approve a pending appointment"""
+    if request.session.get('user_role') != 'staff':
+        return redirect('staff_login')
+    
+    staff_id = request.session.get('user_id')
+    
     try:
+        staff = CustomUser.objects.get(id=staff_id, role='staff')
         app = Appointment.objects.get(id=id)
-        app.status = 'approved'
         
+        print(f"\n{'='*60}")
+        print(f"STAFF APPROVE - DEBUG")
+        print(f"{'='*60}")
+        print(f"Staff ID: {staff_id}")
+        print(f"Staff Name: {staff.first_name} {staff.last_name}")
+        print(f"Appointment ID: {id}")
+        print(f"Appointment Status Before: {app.status}")
+        print(f"Appointment Staff Before: {app.staff}")
+        
+        # Get the next queue number
         last = Appointment.objects.filter(status='approved').order_by('-queue_number').first()
-        app.queue_number = (last.queue_number + 1) if last and last.queue_number else 1
+        next_queue_number = (last.queue_number + 1) if last and last.queue_number else 1
         
+        # ✅ IMPORTANT: Set the staff member who is approving
+        app.status = 'approved'
+        app.staff = staff  # ✅ THIS IS KEY - assign the staff member
+        app.queue_number = next_queue_number
         app.save()
+        
+        print(f"Appointment Status After: {app.status}")
+        print(f"Appointment Staff After: {app.staff}")
+        print(f"Queue Number: {next_queue_number}")
+        print(f"{'='*60}\n")
+        
+        # Send notification to client
         notify_appointment_approved(app)
         messages.success(request, f"Approved! Queue #{app.queue_number}")
-    except:
+    except CustomUser.DoesNotExist:
+        messages.error(request, "Staff not found!")
+    except Appointment.DoesNotExist:
         messages.error(request, "Error approving appointment")
+    except Exception as e:
+        messages.error(request, f"Error: {str(e)}")
     
     return redirect('staff_dashboard')
 

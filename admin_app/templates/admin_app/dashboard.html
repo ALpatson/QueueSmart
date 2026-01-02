@@ -1,147 +1,167 @@
 {% extends 'appointments/base.html' %}
 {% block title %}Admin Dashboard - QueueSmart{% endblock %}
-
 {% block content %}
 <style>
+    .dashboard-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
     .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         margin-bottom: 40px;
-        padding-bottom: 30px;
+        padding-bottom: 20px;
         border-bottom: 2px solid #e0e0e0;
     }
 
     .dashboard-header h1 {
-        color: #333;
         font-size: 32px;
-        margin-bottom: 10px;
+        color: #333;
+        margin: 0;
     }
 
-    .dashboard-header p {
-        color: #666;
-        font-size: 16px;
+    .header-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .nav-btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        border: none;
+        transition: all 0.3s ease;
+        color: white;
+        background: #667eea;
+    }
+
+    .nav-btn:hover {
+        background: #5568d3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 25px;
-        margin-bottom: 50px;
-    }
-
-    .stat-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 30px;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .stat-card::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 200px;
-        height: 200px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-    }
-
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
-    }
-
-    .stat-number {
-        font-size: 48px;
-        font-weight: 700;
-        margin-bottom: 10px;
-        position: relative;
-        z-index: 1;
-    }
-
-    .stat-label {
-        font-size: 16px;
-        opacity: 0.9;
-        position: relative;
-        z-index: 1;
-    }
-
-    .action-section {
-        background: white;
-        padding: 40px;
-        border-radius: 15px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
         margin-bottom: 40px;
     }
 
-    .action-section h2 {
-        color: #333;
-        font-size: 24px;
-        margin-bottom: 25px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #667eea;
-    }
-
-    .btn-group {
-        display: flex;
-        gap: 15px;
-        flex-wrap: wrap;
-        margin-bottom: 30px;
-    }
-
-    .btn {
-        padding: 14px 28px;
-        border: none;
-        border-radius: 10px;
-        font-size: 15px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-block;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-    }
-
-    .btn-danger {
-        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-        color: white;
-    }
-
-    .btn-danger:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
-    }
-
-    .table-container {
+    .stat-card {
         background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        text-align: center;
+        border-top: 4px solid #667eea;
     }
 
-    .table-header {
-        padding: 25px 30px;
-        background: linear-gradient(135deg, #f5f7fa 0%, #f0f2f5 100%);
-        border-bottom: 2px solid #e0e0e0;
+    .stat-card.orange {
+        border-top-color: #ff6b6b;
     }
 
-    .table-header h3 {
-        color: #333;
-        font-size: 20px;
-        margin: 0;
+    .stat-card.green {
+        border-top-color: #28a745;
+    }
+
+    .stat-card.blue {
+        border-top-color: #17a2b8;
+    }
+
+    .stat-number {
+        font-size: 36px;
+        font-weight: bold;
+        color: #667eea;
+        margin: 10px 0;
+    }
+
+    .stat-card.orange .stat-number {
+        color: #ff6b6b;
+    }
+
+    .stat-card.green .stat-number {
+        color: #28a745;
+    }
+
+    .stat-card.blue .stat-number {
+        color: #17a2b8;
+    }
+
+    .stat-label {
+        color: #666;
+        font-size: 14px;
+        margin-top: 10px;
+    }
+
+    .stat-icon {
+        font-size: 32px;
+        margin-bottom: 10px;
+    }
+
+    .section {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .tabs {
+        display: flex;
+        gap: 0;
+        border-bottom: 2px solid #ddd;
+        margin-bottom: 20px;
+    }
+
+    .tab {
+        padding: 12px 20px;
+        cursor: pointer;
+        border: none;
+        background: none;
+        font-weight: 600;
+        color: #666;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .tab.active {
+        color: #667eea;
+        border-bottom-color: #667eea;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .create-btn {
+        display: inline-block;
+        background: #667eea;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .create-btn:hover {
+        background: #5568d3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
     table {
@@ -149,60 +169,58 @@
         border-collapse: collapse;
     }
 
-    table thead {
-        background: #f8f9fa;
-    }
-
     table th {
-        padding: 18px 20px;
+        background: #f5f5f5;
+        padding: 15px;
         text-align: left;
         font-weight: 600;
-        color: #555;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border-bottom: 2px solid #e0e0e0;
+        color: #333;
+        border-bottom: 2px solid #ddd;
     }
 
     table td {
-        padding: 16px 20px;
-        border-bottom: 1px solid #f0f0f0;
+        padding: 15px;
+        border-bottom: 1px solid #eee;
         color: #666;
     }
 
-    table tbody tr {
-        transition: all 0.3s ease;
-    }
-
     table tbody tr:hover {
-        background: #f8f9fa;
+        background: #f9f9f9;
     }
 
     .action-links {
         display: flex;
         gap: 10px;
+        flex-wrap: wrap;
     }
 
-    .action-links a,
-    .action-links button {
+    .btn-small {
         padding: 8px 14px;
-        font-size: 12px;
-        border-radius: 6px;
-        border: none;
-        cursor: pointer;
+        border-radius: 4px;
         text-decoration: none;
-        transition: all 0.3s ease;
+        font-size: 12px;
         font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: all 0.3s ease;
     }
 
     .btn-edit {
-        background: #0dcaf0;
+        background: #17a2b8;
         color: white;
     }
 
     .btn-edit:hover {
-        background: #0bb5e0;
-        transform: translateY(-1px);
+        background: #138496;
+    }
+
+    .btn-reset {
+        background: #ffc107;
+        color: #333;
+    }
+
+    .btn-reset:hover {
+        background: #e0a800;
     }
 
     .btn-delete {
@@ -212,173 +230,209 @@
 
     .btn-delete:hover {
         background: #c82333;
-        transform: translateY(-1px);
     }
 
-    .empty-state {
+    .empty-message {
         text-align: center;
-        padding: 50px 30px;
+        padding: 40px;
         color: #999;
-    }
-
-    .empty-state p {
         font-size: 16px;
-        margin-bottom: 20px;
     }
 
-    @media (max-width: 768px) {
-        .stats-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .action-section {
-            padding: 20px;
-        }
-
-        table {
-            font-size: 14px;
-        }
-
-        table th, table td {
-            padding: 12px 10px;
-        }
-
-        .action-links {
-            flex-direction: column;
-        }
-
-        .action-links a,
-        .action-links button {
-            width: 100%;
-            text-align: center;
-        }
+    .staff-badge {
+        display: inline-block;
+        background: #667eea;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        margin-right: 5px;
+        margin-top: 5px;
     }
 </style>
 
-<div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center;">
-    <div>
-        <h1>Admin Dashboard</h1>
-        <p>Manage your system, staff, and services</p>
-    </div>
-    <a href="{% url 'admin_analytics' %}" class="manage-btn" style="background: #6c63ff; color: white; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: bold;">📊 System Analytics</a>
-</div>
-
-<!-- Stats Cards -->
-<div class="stats-grid">  
-    <div class="stat-card" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
-        <div class="stat-number">{{ staff_count }}</div>
-        <div class="stat-label">Staff Members</div>
-    </div>
-    <div class="stat-card" style="background: linear-gradient(135deg, #fd7e14 0%, #ff6b6b 100%);">
-        <div class="stat-number">{{ client_count }}</div>
-        <div class="stat-label">Clients</div>
-    </div>
-</div>
-
-<!-- Create Staff Section -->
-<div class="action-section">
-    <h2>Staff Management</h2>
-    <div class="btn-group">
-        <a href="{% url 'create_staff' %}" class="btn btn-primary">+ Create New Staff</a>
+<div class="dashboard-wrapper">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div>
+            <h1>👨‍💼 Admin Dashboard</h1>
+            <p style="color: #666; margin-top: 5px;">Manage your QueueSmart system</p>
+        </div>
+        <div class="header-actions">
+            <a href="{% url 'admin_analytics' %}" class="nav-btn">📊 Analytics</a>
+        </div>
     </div>
 
-    {% if staff_users %}
-        <div class="table-container">
-            <div class="table-header">
-                <h3>Staff Members</h3>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Email</th>
-                        <th>Name</th>
-                        <th>Role</th>
-                        <th>Joined</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for staff in staff_users %}
+    <!-- Quick Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-number">{{ staff_members.count }}</div>
+            <div class="stat-label">Staff Members</div>
+        </div>
+        <div class="stat-card orange">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-number">{{ services.count }}</div>
+            <div class="stat-label">Services</div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-icon">📋</div>
+            <div class="stat-number">{{ total_appointments }}</div>
+            <div class="stat-label">Total Appointments</div>
+        </div>
+        <div class="stat-card blue">
+            <div class="stat-icon">👤</div>
+            <div class="stat-number">{{ total_clients }}</div>
+            <div class="stat-label">Total Clients</div>
+        </div>
+    </div>
+
+    <!-- Tabbed Content -->
+    <div class="section">
+        <div class="tabs">
+            <button class="tab active" data-tab="staff">👥 Staff Management</button>
+            <button class="tab" data-tab="services">🎯 Service Management</button>
+            <button class="tab" data-tab="clients">👤 Client Management</button>
+        </div>
+
+        <!-- STAFF MANAGEMENT TAB -->
+        <div id="staff" class="tab-content active">
+            <a href="{% url 'admin_create_staff' %}" class="create-btn">+ Create New Staff</a>
+            
+            {% if staff_members %}
+                <table>
+                    <thead>
                         <tr>
-                            <td>{{ staff.email }}</td>
-                            <td>{{ staff.first_name }} {{ staff.last_name }}</td>
-                            <td><span style="background: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-size: 12px;">{{ staff.role|upper }}</span></td>
-                            <td>{{ staff.date_joined|date:"M d, Y" }}</td>
-                            <td>
-                                <div class="action-links">
-                                    <a href="{% url 'delete_staff' staff.id %}" class="btn-delete" onclick="return confirm('Are you sure you want to delete this staff member?');">Delete</a>
-                                </div>
-                            </td>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Services</th>
+                            <th>Joined</th>
+                            <th>Actions</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {% for staff in staff_members %}
+                            <tr>
+                                <td><strong>{{ staff.first_name }} {{ staff.last_name }}</strong></td>
+                                <td>{{ staff.email }}</td>
+                                <td>{{ staff.phone_number|default:"—" }}</td>
+                                <td>
+                                    {% for service in staff.services.all %}
+                                        <span class="staff-badge">{{ service.name }}</span>
+                                    {% empty %}
+                                        <span style="color: #999;">None</span>
+                                    {% endfor %}
+                                </td>
+                                <td>{{ staff.date_joined|date:"M d, Y" }}</td>
+                                <td>
+                                    <div class="action-links">
+                                        <a href="{% url 'admin_edit_staff' staff.id %}" class="btn-small btn-edit">✏️ Edit</a>
+                                        <a href="{% url 'reset_staff_password' staff.id %}" class="btn-small btn-reset">🔑 Reset Pass</a>
+                                        <a href="{% url 'delete_staff' staff.id %}" class="btn-small btn-delete" onclick="return confirm('Are you sure?');">🗑️ Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="empty-message">No staff members yet</div>
+            {% endif %}
         </div>
-    {% else %}
-        <div class="empty-state">
-            <p>No staff members yet. Create your first staff member to get started.</p>
+
+        <!-- SERVICE MANAGEMENT TAB -->
+        <div id="services" class="tab-content">
+            <a href="{% url 'admin_create_service' %}" class="create-btn" style="background: #17a2b8;">+ Create New Service</a>
+            
+            {% if services %}
+                {% for service in services %}
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
+                        <div style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 8px;">{{ service.name }}</div>
+                        <div style="color: #666; font-size: 14px; margin-bottom: 8px;">{{ service.description }}</div>
+                        <div style="color: #999; font-size: 12px; margin-bottom: 12px;">⏱️ Duration: {{ service.duration }} minutes</div>
+                        <div style="color: #667eea; font-size: 12px; margin-bottom: 12px;">
+                            <strong>Provided by:</strong>
+                            {% for staff in service.staff.all %}
+                                <span class="staff-badge">{{ staff.first_name }} {{ staff.last_name }}</span>
+                            {% empty %}
+                                <span style="color: #999;">No staff assigned</span>
+                            {% endfor %}
+                        </div>
+                        <div class="action-links">
+                            <a href="{% url 'admin_edit_service' service.id %}" class="btn-small btn-edit">✏️ Edit</a>
+                            <a href="{% url 'admin_delete_service' service.id %}" class="btn-small btn-delete" onclick="return confirm('Are you sure?');">🗑️ Delete</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-message">No services created yet</div>
+            {% endif %}
         </div>
-    {% endif %}
+
+        <!-- CLIENT MANAGEMENT TAB - NEW! -->
+        <div id="clients" class="tab-content">
+            {% if all_clients %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Appointments</th>
+                            <th>Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for client in all_clients %}
+                            <tr>
+                                <td><strong>{{ client.first_name }} {{ client.last_name }}</strong></td>
+                                <td>{{ client.email }}</td>
+                                <td>{{ client.phone_number|default:"—" }}</td>
+                                <td>
+                                    <span style="background: #e7f3ff; color: #0066cc; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
+                                        {{ client.appointments.count }}
+                                    </span>
+                                </td>
+                                <td>{{ client.date_joined|date:"M d, Y" }}</td>
+                                <td>
+                                    <div class="action-links">
+                                        <a href="{% url 'delete_user' client.id %}" class="btn-small btn-delete" onclick="return confirm('Delete this client? All their appointments will also be deleted.');">🗑️ Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="empty-message">No clients yet</div>
+            {% endif %}
+        </div>
+    </div>
 </div>
 
-<!-- All Users Section -->
-<div class="action-section">
-    <h2>All Users</h2>
-    {% if all_users %}
-        <div class="table-container">
-            <div class="table-header">
-                <h3>Complete User List</h3>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Email</th>
-                        <th>Name</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>Joined</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for user in all_users %}
-                        <tr>
-                            <td>{{ user.email }}</td>
-                            <td>{{ user.first_name }} {{ user.last_name }}</td>
-                            <td>
-                                {% if user.role == 'admin' %}
-                                    <span style="background: #667eea; color: white; padding: 5px 10px; border-radius: 5px; font-size: 12px;">ADMIN</span>
-                                {% elif user.role == 'staff' %}
-                                    <span style="background: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-size: 12px;">STAFF</span>
-                                {% else %}
-                                    <span style="background: #fd7e14; color: white; padding: 5px 10px; border-radius: 5px; font-size: 12px;">CLIENT</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if user.is_active %}
-                                    <span style="color: #28a745; font-weight: 600;">Active</span>
-                                {% else %}
-                                    <span style="color: #dc3545; font-weight: 600;">Inactive</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ user.date_joined|date:"M d, Y" }}</td>
-                            <td>
-                                <div class="action-links">
-                                    {% if user.role != 'admin' %}
-                                        <a href="{% url 'delete_user' user.id %}" class="btn-delete" onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
-                                    {% endif %}
-                                </div>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% else %}
-        <div class="empty-state">
-            <p>No users found.</p>
-        </div>
-    {% endif %}
-</div>
+<script>
+    // Tab switching functionality
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabName = tab.getAttribute('data-tab');
+            
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(t => {
+                t.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            tab.classList.add('active');
+        });
+    });
+</script>
 
 {% endblock %}

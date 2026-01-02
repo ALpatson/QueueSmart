@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-# Create your models here. 
+
 class CustomUser(models.Model):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=30)
@@ -30,6 +30,8 @@ class Service(models.Model):
 class Appointment(models.Model):
     client = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='appointments')
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    # ✅ ADD THIS FIELD - Track which staff member handles this appointment
+    staff = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name='staff_appointments')
     appointment_date = models.DateField()
     appointment_time = models.TimeField()
     status = models.CharField(max_length=20, choices=[('pending', 'Pending'), ('approved', 'Approved'), ('rejected', 'Rejected'),('serving', 'Serving'), ('completed', 'Completed')], default='pending')
@@ -49,12 +51,13 @@ class Notification(models.Model):
         ('approval', 'Approval'),
         ('rejection', 'Rejection'),
         ('reminder', 'Reminder'),
-        ('cancellation', 'Cancellation'),  # NEW - Client cancelled appointment
-        ('edited', 'Edited'),  # NEW - Client edited appointment
+        ('cancellation', 'Cancellation'),
+        ('edited', 'Edited'),
+        ('booking', 'Booking'),  # ✅ ADD THIS for staff new booking notifications
     ]
     
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='notifications')
-    appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, related_name='notifications', blank=True, null=True)
+    appointment = models.ForeignKey(Appointment, on_delete=models.SET_NULL, related_name='notifications', blank=True, null=True)
     message = models.TextField()
     notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES, default='confirmation')
     is_read = models.BooleanField(default=False)
