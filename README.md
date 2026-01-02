@@ -29,3 +29,17 @@ QueueSmart is a role-based appointment booking and queue management system desig
 - Email notifications for appointment updates and cancellations
 - Secure password reset for clients
 - Staff password reset using temporary credentials with mandatory change on first login
+
+##  Future Improvements (v1.1.0 Roadmap)
+
+Planned enhancements for the next release include:
+
+- Online payments integration for paid services
+- Appointment rescheduling by clients
+- Advanced admin analytics (appointments, cancellations, staff performance)
+- SMS notifications alongside email alerts
+- Role-based permissions refinement for admin and staff
+- Improved UI/UX for mobile responsiveness
+- Audit logs for admin and staff actions
+- API endpoints for future mobile app integration
+
