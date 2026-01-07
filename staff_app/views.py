@@ -614,3 +614,161 @@ def staff_analytics_view(request):
     context.update(get_user_context(staff_id))
     
     return render(request, 'staff_app/analytics.html', context)
+
+def manage_availability(request):
+    """Staff member can manage their available time slots - only shows FUTURE slots"""
+    if request.session.get('user_role') != 'staff':
+        return redirect('staff_login')
+    
+    staff_id = request.session.get('user_id')
+    staff_name = request.session.get('staff_name', 'Staff')
+    
+    try:
+        staff = CustomUser.objects.get(id=staff_id, role='staff')
+    except CustomUser.DoesNotExist:
+        return redirect('staff_login')
+    
+    # Get current date and time
+    now = datetime.now()
+    today = now.date()
+    current_time = now.time()
+    
+    # ✅ DELETE PAST APPOINTMENTS FROM DATABASE
+    past_slots = StaffAvailability.objects.filter(
+        staff=staff
+    ).exclude(
+        date__gt=today  # Keep dates in future
+    ).filter(
+        date=today,
+        start_time__lt=current_time  # Delete times in past today
+    )
+    
+    deleted_count = past_slots.count()
+    past_slots.delete()
+    
+    if deleted_count > 0:
+        print(f"✅ Deleted {deleted_count} past time slots")
+    
+    # ✅ ONLY GET FUTURE APPOINTMENTS (don't display past ones)
+    availabilities = StaffAvailability.objects.filter(
+        staff=staff
+    ).exclude(
+        date__lt=today  # Exclude past dates
+    ).exclude(
+        date=today,
+        start_time__lt=current_time  # Exclude past times today
+    ).order_by('date', 'start_time')
+    
+    # ✅ FORMAT FOR DISPLAY
+    availability_data = []
+    for avail in availabilities:
+        availability_data.append({
+            'id': avail.id,
+            'date': avail.date,
+            'start_time': avail.start_time,
+            'end_time': avail.end_time,
+            'is_available': avail.is_available,
+            'formatted_date': avail.date.strftime('%B %d, %Y'),
+            'formatted_start': avail.start_time.strftime('%I:%M %p'),
+            'formatted_end': avail.end_time.strftime('%I:%M %p'),
+        })
+    
+    context = {
+        'staff_name': staff.first_name,
+        'user_first_name': staff.first_name,
+        'availabilities': availability_data,
+        'today': today,
+        'current_time': current_time.strftime('%H:%M'),
+    }
+    
+    return render(request, 'staff_app/manage_availability.html', context)
+
+
+def add_availability(request):
+    """Add a new availability time slot"""
+    if request.method == 'POST':
+        staff_id = request.session.get('user_id')
+        
+        try:
+            staff = CustomUser.objects.get(id=staff_id, role='staff')
+        except CustomUser.DoesNotExist:
+            messages.error(request, "Staff not found!")
+            return redirect('staff_manage_availability')
+        
+        date_str = request.POST.get('date')
+        start_time_str = request.POST.get('start_time')
+        end_time_str = request.POST.get('end_time')
+        
+        try:
+            slot_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            slot_start_time = datetime.strptime(start_time_str, '%H:%M').time()
+            slot_end_time = datetime.strptime(end_time_str, '%H:%M').time()
+            
+            # ✅ VALIDATION: Check if date/time is in the past
+            now = datetime.now()
+            today = now.date()
+            current_time = now.time()
+            
+            # Can't add past dates
+            if slot_date < today:
+                messages.error(request, "❌ Cannot add slot for a past date!")
+                return redirect('staff_manage_availability')
+            
+            # Can't add past times on today
+            if slot_date == today and slot_start_time < current_time:
+                messages.error(request, "❌ Cannot add slot for a past time today!")
+                return redirect('staff_manage_availability')
+            
+            # Can't add if start time is after end time
+            if slot_start_time >= slot_end_time:
+                messages.error(request, "❌ Start time must be before end time!")
+                return redirect('staff_manage_availability')
+            
+            # Check if slot already exists
+            exists = StaffAvailability.objects.filter(
+                staff=staff,
+                date=slot_date,
+                start_time=slot_start_time,
+                end_time=slot_end_time
+            ).exists()
+            
+            if exists:
+                messages.warning(request, "⚠️ This time slot already exists!")
+                return redirect('staff_manage_availability')
+            
+            # ✅ Create the availability slot
+            StaffAvailability.objects.create(
+                staff=staff,
+                date=slot_date,
+                start_time=slot_start_time,
+                end_time=slot_end_time,
+                is_available=True
+            )
+            
+            messages.success(request, f"✅ Slot added: {slot_date.strftime('%B %d')} from {slot_start_time.strftime('%I:%M %p')} to {slot_end_time.strftime('%I:%M %p')}")
+            
+        except ValueError:
+            messages.error(request, "Invalid date or time format!")
+        
+        return redirect('staff_manage_availability')
+    
+    return redirect('staff_manage_availability')
+
+
+def delete_availability(request):
+    """Delete an availability time slot"""
+    if request.method == 'POST':
+        staff_id = request.session.get('user_id')
+        availability_id = request.POST.get('availability_id')
+        
+        try:
+            avail = StaffAvailability.objects.get(id=availability_id, staff_id=staff_id)
+            slot_time = f"{avail.start_time.strftime('%I:%M %p')} - {avail.end_time.strftime('%I:%M %p')}"
+            avail.delete()
+            messages.success(request, f"✅ Slot {slot_time} deleted!")
+        except StaffAvailability.DoesNotExist:
+            messages.error(request, "❌ Slot not found!")
+        
+        return redirect('staff_manage_availability')
+    
+    return redirect('staff_manage_availability')

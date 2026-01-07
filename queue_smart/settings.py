@@ -129,6 +129,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = []
 # Email Configuration - SendGrid
 # EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # DEFAULT_FROM_EMAIL = 'noreply@queuesmart.com'
 MEDIA_URL = '/'

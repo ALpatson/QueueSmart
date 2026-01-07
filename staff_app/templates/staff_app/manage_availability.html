@@ -1,0 +1,301 @@
+{% extends 'appointments/base.html' %}
+{% block title %}Manage Availability - QueueSmart{% endblock %}
+
+{% block content %}
+<style>
+    .availability-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .availability-header {
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .availability-header h1 {
+        color: #333;
+        margin-bottom: 5px;
+    }
+    
+    .add-form {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 30px;
+        border-radius: 12px;
+        color: white;
+        margin-bottom: 40px;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    
+    .form-group input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-size: 16px;
+        transition: all 0.3s ease;
+    }
+    
+    .form-group input:focus {
+        outline: none;
+        border-color: white;
+        background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .form-group input::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+    }
+    
+    .btn-add {
+        background: white;
+        color: #667eea;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        font-size: 16px;
+    }
+    
+    .btn-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .availability-list {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .availability-list h3 {
+        background: #f5f5f5;
+        padding: 20px;
+        margin: 0;
+        color: #333;
+        font-size: 18px;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .availability-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid #e0e0e0;
+        transition: all 0.3s ease;
+    }
+    
+    .availability-item:last-child {
+        border-bottom: none;
+    }
+    
+    .availability-item:hover {
+        background: #f9f9f9;
+    }
+    
+    .availability-info {
+        flex: 1;
+    }
+    
+    .availability-date {
+        font-weight: 600;
+        color: #667eea;
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+    
+    .availability-time {
+        color: #666;
+        font-size: 14px;
+    }
+    
+    .btn-delete {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-delete:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+    }
+    
+    .empty-message {
+        padding: 40px;
+        text-align: center;
+        color: #999;
+        font-size: 16px;
+    }
+    
+    .messages {
+        margin-bottom: 20px;
+    }
+    
+    .alert {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .alert-danger {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    
+    .alert-warning {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeeba;
+    }
+</style>
+
+<div class="availability-container">
+    <div class="availability-header">
+        <h1>📅 Manage My Availability</h1>
+        <p>Add time slots when you're available to serve clients</p>
+    </div>
+    
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Add Availability Form -->
+    <form method="POST" action="{% url 'staff_add_availability' %}" class="add-form">
+        {% csrf_token %}
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="date">📅 Date</label>
+                <input 
+                    type="date" 
+                    id="date" 
+                    name="date" 
+                    required
+                    min="{{ today|date:'Y-m-d' }}"
+                >
+                <small style="color: rgba(255,255,255,0.8);">Future dates only</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="start_time">🕐 Start Time</label>
+                <input 
+                    type="time" 
+                    id="start_time" 
+                    name="start_time" 
+                    required
+                >
+                <small style="color: rgba(255,255,255,0.8);">From time</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="end_time">🕐 End Time</label>
+                <input 
+                    type="time" 
+                    id="end_time" 
+                    name="end_time" 
+                    required
+                >
+                <small style="color: rgba(255,255,255,0.8);">To time</small>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn-add">➕ Add Time Slot</button>
+    </form>
+    
+    <!-- Current Availabilities -->
+    <div class="availability-list">
+        <h3>Your Available Time Slots (Future Only)</h3>
+        
+        {% if availabilities %}
+            {% for avail in availabilities %}
+            <div class="availability-item">
+                <div class="availability-info">
+                    <div class="availability-date">{{ avail.formatted_date }}</div>
+                    <div class="availability-time">
+                        ✅ {{ avail.formatted_start }} - {{ avail.formatted_end }}
+                    </div>
+                </div>
+                <form method="POST" action="{% url 'staff_delete_availability' %}" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="availability_id" value="{{ avail.id }}">
+                    <button type="submit" class="btn-delete" onclick="return confirm('Delete this slot?')">🗑️ Delete</button>
+                </form>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-message">
+                📭 No future availability slots. Add one to start accepting appointments!
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // ✅ Disable past times on today
+    const dateInput = document.getElementById('date');
+    const startTimeInput = document.getElementById('start_time');
+    const endTimeInput = document.getElementById('end_time');
+    
+    dateInput.addEventListener('change', function() {
+        const today = new Date().toISOString().split('T')[0];
+        
+        if (this.value === today) {
+            // If selected date is today, disable past times
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            startTimeInput.min = `${hours}:${minutes}`;
+            endTimeInput.min = `${hours}:${minutes}`;
+        } else {
+            // If future date, allow all times
+            startTimeInput.min = '';
+            endTimeInput.min = '';
+        }
+    });
+</script>
+
+{% endblock %}
