@@ -1,4 +1,4 @@
-{% extends 'appointments/base.html' %}
+﻿{% extends 'appointments/base.html' %}
 {% block title %}Edit Appointment - QueueSmart{% endblock %}
 
 {% block content %}
@@ -19,7 +19,7 @@
         text-align: center;
         margin-bottom: 40px;
         padding-bottom: 25px;
-        border-bottom: 2px solid #fd7e14;
+        border-bottom: 2px solid #C8A97E;
     }
 
     .form-header h1 {
@@ -38,7 +38,7 @@
         padding: 15px;
         border-radius: 10px;
         margin-bottom: 25px;
-        border-left: 4px solid #fd7e14;
+        border-left: 4px solid #C8A97E;
     }
 
     .appointment-info p {
@@ -78,9 +78,9 @@
 
     input:focus, select:focus {
         outline: none;
-        border-color: #fd7e14;
+        border-color: #C8A97E;
         background: white;
-        box-shadow: 0 0 0 4px rgba(253, 126, 20, 0.1);
+        box-shadow: 0 0 0 4px rgba(107, 144, 158, 0.15);
     }
 
     .button-group {
@@ -103,14 +103,14 @@
     }
 
     .btn-update {
-        background: linear-gradient(135deg, #fd7e14 0%, #ff6b6b 100%);
+        background: #C8A97E;
         color: white;
-        box-shadow: 0 4px 15px rgba(253, 126, 20, 0.3);
+        box-shadow: 0 4px 15px rgba(107, 144, 158, 0.3);
     }
 
     .btn-update:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(253, 126, 20, 0.4);
+        box-shadow: 0 6px 20px rgba(15, 118, 110, 0.4);
     }
 
     .btn-cancel {
@@ -136,9 +136,9 @@
     }
 
     .alert-error {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
+        background: #F4F1EB;
+        color: #0F4C5C;
+        border: 1px solid #F4F1EB;
     }
 
     @keyframes slideDown {
@@ -222,3 +222,4 @@
 </div>
 
 {% endblock %}
+

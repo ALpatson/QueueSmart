@@ -1,4 +1,4 @@
-{% extends 'appointments/base.html' %}
+﻿{% extends 'appointments/base.html' %}
 {% block title %}My Appointments - QueueSmart{% endblock %}
 
 {% block content %}
@@ -22,7 +22,7 @@
 
     .btn-book {
         padding: 14px 28px;
-        background: linear-gradient(135deg, #fd7e14 0%, #ff6b6b 100%);
+        background: #C8A97E;
         color: white;
         border: none;
         border-radius: 10px;
@@ -31,18 +31,18 @@
         cursor: pointer;
         text-decoration: none;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(253, 126, 20, 0.3);
+        box-shadow: 0 4px 15px rgba(107, 144, 158, 0.3);
         display: inline-block;
     }
 
     .btn-book:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(253, 126, 20, 0.4);
+        box-shadow: 0 6px 20px rgba(15, 118, 110, 0.4);
     }
 
     .btn-analytics {
         padding: 14px 28px;
-        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        background: #C8A97E;
         color: white;
         border: none;
         border-radius: 10px;
@@ -51,13 +51,13 @@
         cursor: pointer;
         text-decoration: none;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3);
+        box-shadow: 0 4px 15px rgba(107, 144, 158, 0.3);
         display: inline-block;
     }
 
     .btn-analytics:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(23, 162, 184, 0.4);
+        box-shadow: 0 6px 20px rgba(15, 118, 110, 0.4);
     }
 
     .appointments-section {
@@ -72,7 +72,7 @@
         font-size: 24px;
         margin-bottom: 25px;
         padding-bottom: 15px;
-        border-bottom: 2px solid #fd7e14;
+        border-bottom: 2px solid #C8A97E;
     }
 
     .appointments-grid {
@@ -82,7 +82,7 @@
     }
 
     .appointment-card {
-        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        background: #f8f9fa;
         border: 2px solid #e0e0e0;
         border-radius: 12px;
         padding: 25px;
@@ -98,13 +98,13 @@
         left: 0;
         right: 0;
         height: 4px;
-        background: linear-gradient(90deg, #fd7e14 0%, #ff6b6b 100%);
+        background: #C8A97E;
     }
 
     .appointment-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
-        border-color: #fd7e14;
+        border-color: #C8A97E;
     }
 
     .card-header {
@@ -130,23 +130,23 @@
     }
 
     .status-pending {
-        background: #ffc107;
+        background: #C8A97E;
         color: #000;
     }
 
     .status-approved {
-        background: #28a745;
+        background: #0F4C5C;
         color: white;
     }
 
     .status-serving {
-        background: #0dcaf0;
+        background: #2F6D80;
         color: white;
         animation: pulse 2s infinite;
     }
 
     .status-rejected {
-        background: #dc3545;
+        background: #0F4C5C;
         color: white;
     }
 
@@ -192,7 +192,7 @@
     .queue-number {
         font-size: 28px;
         font-weight: 700;
-        color: #fd7e14;
+        color: #C8A97E;
         margin-bottom: 5px;
     }
 
@@ -232,21 +232,21 @@
     }
 
     .edit-link {
-        background: #0dcaf0;
+        background: #C8A97E;
         color: white;
     }
 
     .edit-link:hover {
-        background: #0bb5d4;
+        background: #2F6D80;
     }
 
     .cancel-link {
-        background: #dc3545;
+        background: #0F4C5C;
         color: white;
     }
 
     .cancel-link:hover {
-        background: #c82333;
+        background: #0F4C5C;
     }
 
     .empty-state {
@@ -375,3 +375,5 @@
 </div>
 
 {% endblock %}
+
+

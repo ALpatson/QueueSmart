@@ -1,4 +1,4 @@
-{% extends 'appointments/base.html' %}
+﻿{% extends 'appointments/base.html' %}
 
 {% block title %}Staff Dashboard - QueueSmart{% endblock %}
 
@@ -38,7 +38,7 @@
                         <td>{{ appointment.service.name }}</td>
                         <td>{{ appointment.appointment_date }}</td>
                         <td>{{ appointment.appointment_time }}</td>
-                        <td><span style="background: #ffc107; padding: 5px 10px; border-radius: 4px; color: black;">{{ appointment.status }}</span></td>
+                        <td><span style="background: #C8A97E; padding: 5px 10px; border-radius: 4px; color: black;">{{ appointment.status }}</span></td>
                         <td class="action-links">
                             <a href="{% url 'approve_appointment' appointment.id %}" class="btn btn-success">Approve</a>
                             <a href="{% url 'reject_appointment' appointment.id %}" class="btn btn-danger">Reject</a>
@@ -68,12 +68,12 @@
             <tbody>
                 {% for appointment in approved_appointments %}
                     <tr>
-                        <td><strong style="font-size: 18px; color: #667eea;">{{ appointment.queue_number }}</strong></td>
+                        <td><strong style="font-size: 18px; color: #2F6D80;">{{ appointment.queue_number }}</strong></td>
                         <td>{{ appointment.client.first_name }} {{ appointment.client.last_name }}</td>
                         <td>{{ appointment.service.name }}</td>
                         <td>{{ appointment.appointment_date }}</td>
                         <td>{{ appointment.appointment_time }}</td>
-                        <td><span style="background: #28a745; padding: 5px 10px; border-radius: 4px; color: white;">{{ appointment.status }}</span></td>
+                        <td><span style="background: #0F4C5C; padding: 5px 10px; border-radius: 4px; color: white;">{{ appointment.status }}</span></td>
                         <td class="action-links">
                             <a href="{% url 'mark_serving' appointment.id %}" class="btn btn-success">Start Serving</a>
                         </td>
@@ -85,3 +85,4 @@
         <p style="text-align: center; color: #666; padding: 20px;">No approved appointments</p>
     {% endif %}
 {% endblock %}
+

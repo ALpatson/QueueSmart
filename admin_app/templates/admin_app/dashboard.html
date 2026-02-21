@@ -1,4 +1,4 @@
-{% extends 'appointments/base.html' %}
+﻿{% extends 'appointments/base.html' %}
 {% block title %}Admin Dashboard - QueueSmart{% endblock %}
 {% block content %}
 <style>
@@ -38,11 +38,11 @@
         border: none;
         transition: all 0.3s ease;
         color: white;
-        background: #667eea;
+        background: #C8A97E;
     }
 
     .nav-btn:hover {
-        background: #5568d3;
+        background: #2F6D80;
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
@@ -60,38 +60,38 @@
         border-radius: 10px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         text-align: center;
-        border-top: 4px solid #667eea;
+        border-top: 4px solid #C8A97E;
     }
 
     .stat-card.orange {
-        border-top-color: #ff6b6b;
+        border-top-color: #C8A97E;
     }
 
     .stat-card.green {
-        border-top-color: #28a745;
+        border-top-color: #C8A97E;
     }
 
     .stat-card.blue {
-        border-top-color: #17a2b8;
+        border-top-color: #C8A97E;
     }
 
     .stat-number {
         font-size: 36px;
         font-weight: bold;
-        color: #667eea;
+        color: #C8A97E;
         margin: 10px 0;
     }
 
     .stat-card.orange .stat-number {
-        color: #ff6b6b;
+        color: #C8A97E;
     }
 
     .stat-card.green .stat-number {
-        color: #28a745;
+        color: #C8A97E;
     }
 
     .stat-card.blue .stat-number {
-        color: #17a2b8;
+        color: #C8A97E;
     }
 
     .stat-label {
@@ -132,8 +132,8 @@
     }
 
     .tab.active {
-        color: #667eea;
-        border-bottom-color: #667eea;
+        color: #C8A97E;
+        border-bottom-color: #C8A97E;
     }
 
     .tab-content {
@@ -146,7 +146,7 @@
 
     .create-btn {
         display: inline-block;
-        background: #667eea;
+        background: #C8A97E;
         color: white;
         padding: 12px 24px;
         border-radius: 6px;
@@ -159,7 +159,7 @@
     }
 
     .create-btn:hover {
-        background: #5568d3;
+        background: #2F6D80;
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
@@ -206,30 +206,30 @@
     }
 
     .btn-edit {
-        background: #17a2b8;
+        background: #C8A97E;
         color: white;
     }
 
     .btn-edit:hover {
-        background: #138496;
+        background: #2F6D80;
     }
 
     .btn-reset {
-        background: #ffc107;
+        background: #C8A97E;
         color: #333;
     }
 
     .btn-reset:hover {
-        background: #e0a800;
+        background: #C8A97E;
     }
 
     .btn-delete {
-        background: #dc3545;
+        background: #0F4C5C;
         color: white;
     }
 
     .btn-delete:hover {
-        background: #c82333;
+        background: #0F4C5C;
     }
 
     .empty-message {
@@ -241,7 +241,7 @@
 
     .staff-badge {
         display: inline-block;
-        background: #667eea;
+        background: #C8A97E;
         color: white;
         padding: 4px 10px;
         border-radius: 12px;
@@ -343,15 +343,15 @@
 
         <!-- SERVICE MANAGEMENT TAB -->
         <div id="services" class="tab-content">
-            <a href="{% url 'admin_create_service' %}" class="create-btn" style="background: #17a2b8;">+ Create New Service</a>
+            <a href="{% url 'admin_create_service' %}" class="create-btn" style="background: #C8A97E;">+ Create New Service</a>
             
             {% if services %}
                 {% for service in services %}
-                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #C8A97E;">
                         <div style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 8px;">{{ service.name }}</div>
                         <div style="color: #666; font-size: 14px; margin-bottom: 8px;">{{ service.description }}</div>
                         <div style="color: #999; font-size: 12px; margin-bottom: 12px;">⏱️ Duration: {{ service.duration }} minutes</div>
-                        <div style="color: #667eea; font-size: 12px; margin-bottom: 12px;">
+                        <div style="color: #C8A97E; font-size: 12px; margin-bottom: 12px;">
                             <strong>Provided by:</strong>
                             {% for staff in service.staff.all %}
                                 <span class="staff-badge">{{ staff.first_name }} {{ staff.last_name }}</span>
@@ -391,7 +391,7 @@
                                 <td>{{ client.email }}</td>
                                 <td>{{ client.phone_number|default:"—" }}</td>
                                 <td>
-                                    <span style="background: #e7f3ff; color: #0066cc; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
+                                    <span style="background: #e7f3ff; color: #2F6D80; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
                                         {{ client.appointments.count }}
                                     </span>
                                 </td>
@@ -436,3 +436,5 @@
 </script>
 
 {% endblock %}
+
+

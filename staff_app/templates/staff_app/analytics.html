@@ -1,4 +1,4 @@
-{% extends 'appointments/base.html' %}
+﻿{% extends 'appointments/base.html' %}
 {% block title %}Staff Analytics - QueueSmart{% endblock %}
 
 {% block content %}
@@ -51,20 +51,20 @@
     .metric-value {
         font-size: 48px;
         font-weight: 700;
-        color: #667eea;
+        color: #C8A97E;
         margin: 0;
     }
 
     .metric-value.completed {
-        color: #28a745;
+        color: #C8A97E;
     }
 
     .metric-value.today {
-        color: #ffc107;
+        color: #2F6D80;
     }
 
     .metric-value.time {
-        color: #17a2b8;
+        color: #2F6D80;
     }
 
     /* Schedule Section */
@@ -105,19 +105,19 @@
         font-weight: 700;
         margin-bottom: 20px;
         padding-left: 15px;
-        border-left: 4px solid #667eea;
+        border-left: 4px solid #C8A97E;
     }
 
     .status-title.pending {
-        border-left-color: #ffc107;
+        border-left-color: #2F6D80;
     }
 
     .status-title.approved {
-        border-left-color: #17a2b8;
+        border-left-color: #C8A97E;
     }
 
     .status-title.serving {
-        border-left-color: #28a745;
+        border-left-color: #C8A97E;
     }
 
     .status-title.completed {
@@ -131,7 +131,7 @@
     }
 
     .appointment-item {
-        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        background: #f8f9fa;
         border: 2px solid #e0e0e0;
         border-radius: 12px;
         padding: 20px;
@@ -142,22 +142,22 @@
     }
 
     .appointment-item:hover {
-        border-color: #667eea;
-        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+        border-color: #C8A97E;
+        box-shadow: 0 8px 20px rgba(132, 122, 74, 0.15);
         transform: translateX(5px);
     }
 
     .appointment-item.pending {
-        border-left: 5px solid #ffc107;
+        border-left: 5px solid #2F6D80;
     }
 
     .appointment-item.approved {
-        border-left: 5px solid #17a2b8;
+        border-left: 5px solid #C8A97E;
     }
 
     .appointment-item.serving {
-        border-left: 5px solid #28a745;
-        background: linear-gradient(135deg, #d4edda 0%, #ffffff 100%);
+        border-left: 5px solid #C8A97E;
+        background: #f8f9fa;
     }
 
     .appointment-item.completed {
@@ -190,7 +190,7 @@
     }
 
     .appointment-time {
-        background: #667eea;
+        background: #C8A97E;
         color: white;
         padding: 8px 16px;
         border-radius: 25px;
@@ -201,8 +201,8 @@
     }
 
     .appointment-queue {
-        background: #ffc107;
-        color: #000;
+        background: #F4F1EB;
+        color: #333;
         padding: 8px 16px;
         border-radius: 25px;
         font-weight: 700;
@@ -214,7 +214,7 @@
     .empty-state {
         text-align: center;
         padding: 40px;
-        color: #999;
+        color: #C8A97E;
     }
 
     .empty-icon {
@@ -355,8 +355,8 @@
                         </div>
                     </div>
                     <div style="display: flex; gap: 10px; align-items: center;">
-                        <div class="appointment-queue" style="background: #28a745; color: white;">#{{ schedule.serving.queue_number }}</div>
-                        <div class="appointment-time" style="background: #28a745;">{{ schedule.serving.time }}</div>
+                        <div class="appointment-queue" style="background: #C8A97E; color: white;">#{{ schedule.serving.queue_number }}</div>
+                        <div class="appointment-time" style="background: #C8A97E;">{{ schedule.serving.time }}</div>
                     </div>
                 </div>
             </div>
@@ -398,3 +398,5 @@
 </div>
 
 {% endblock %}
+
+

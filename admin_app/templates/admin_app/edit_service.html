@@ -1,4 +1,4 @@
-{% extends 'appointments/base.html' %}
+﻿{% extends 'appointments/base.html' %}
 {% block title %}Edit Service - QueueSmart{% endblock %}
 {% block content %}
 
@@ -53,8 +53,8 @@
     textarea:focus,
     select:focus {
         outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: #C8A97E;
+        box-shadow: 0 0 0 3px rgba(132, 122, 74, 0.12);
     }
 
     textarea {
@@ -79,7 +79,7 @@
         height: 18px;
         margin-right: 10px;
         cursor: pointer;
-        accent-color: #667eea;
+        accent-color: #C8A97E;
     }
 
     .checkbox-item label {
@@ -108,13 +108,13 @@
     }
 
     .btn-primary {
-        background: #667eea;
+        background: #C8A97E;
         color: white;
         flex: 1;
     }
 
     .btn-primary:hover {
-        background: #5568d3;
+        background: #2F6D80;
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
@@ -130,21 +130,21 @@
     }
 
     .error-message {
-        background: #f8d7da;
-        color: #721c24;
+        background: #F4F1EB;
+        color: #0F4C5C;
         padding: 12px;
         border-radius: 6px;
         margin-bottom: 20px;
-        border-left: 4px solid #dc3545;
+        border-left: 4px solid #0F4C5C;
     }
 
     .success-message {
-        background: #d4edda;
-        color: #155724;
+        background: #F4F1EB;
+        color: #0F4C5C;
         padding: 12px;
         border-radius: 6px;
         margin-bottom: 20px;
-        border-left: 4px solid #28a745;
+        border-left: 4px solid #0F4C5C;
     }
 </style>
 
@@ -231,3 +231,5 @@
 </div>
 
 {% endblock %}
+
+

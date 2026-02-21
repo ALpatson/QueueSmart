@@ -1,4 +1,4 @@
-{% extends 'appointments/base.html' %}
+﻿{% extends 'appointments/base.html' %}
 {% block title %}Edit Staff - QueueSmart{% endblock %}
 {% block content %}
 
@@ -55,8 +55,8 @@
     input[type="text"]:focus,
     input[type="tel"]:focus {
         outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: #C8A97E;
+        box-shadow: 0 0 0 3px rgba(132, 122, 74, 0.12);
     }
 
     .services-group {
@@ -88,7 +88,7 @@
 
     .service-option:hover {
         background: #f0f8ff;
-        border-color: #667eea;
+        border-color: #C8A97E;
     }
 
     .service-option input[type="checkbox"] {
@@ -129,9 +129,9 @@
 
     .alert {
         padding: 12px 15px;
-        background: #d1ecf1;
-        border: 1px solid #bee5eb;
-        color: #0c5460;
+        background: #F4F1EB;
+        border: 1px solid #F4F1EB;
+        color: #0F4C5C;
         border-radius: 6px;
         margin-bottom: 20px;
         font-size: 14px;
@@ -142,7 +142,7 @@
         padding: 15px;
         border-radius: 6px;
         margin-bottom: 25px;
-        border-left: 4px solid #667eea;
+        border-left: 4px solid #C8A97E;
     }
 
     .staff-info-row {
@@ -179,14 +179,14 @@
     }
 
     .btn-primary {
-        background: #28a745;
+        background: #C8A97E;
         color: white;
     }
 
     .btn-primary:hover {
-        background: #218838;
+        background: #2F6D80;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        box-shadow: 0 4px 12px rgba(60, 79, 89, 0.3);
     }
 
     .btn-secondary {
@@ -199,22 +199,22 @@
     }
 
     .btn-danger {
-        background: #dc3545;
+        background: #0F4C5C;
         color: white;
         flex: 0.5;
     }
 
     .btn-danger:hover {
-        background: #c82333;
+        background: #0F4C5C;
     }
 
     .service-required {
-        color: #dc3545;
+        color: #0F4C5C;
         font-size: 12px;
         margin-top: 15px;
         padding: 10px;
-        background: #f8d7da;
-        border: 1px solid #f5c6cb;
+        background: #F4F1EB;
+        border: 1px solid #F4F1EB;
         border-radius: 4px;
     }
 </style>
@@ -244,7 +244,7 @@
             <span class="staff-info-value">
                 {% if staff.services.all %}
                     {% for service in staff.services.all %}
-                        <span style="background: #667eea; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; display: inline-block; margin: 2px;">{{ service.name }}</span>
+                        <span style="background: #C8A97E; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; display: inline-block; margin: 2px;">{{ service.name }}</span>
                     {% endfor %}
                 {% else %}
                     <span style="color: #999;">None assigned</span>
@@ -320,3 +320,5 @@
 </script>
 
 {% endblock %}
+
+
